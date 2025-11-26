@@ -1,34 +1,30 @@
-// ======== GitHub SHA 自動更新檢查 ========
-(async function autoUpdateByGitHub() {
-    const REPO = "HPLEE785/golf-score";   // ⚠ 請確認是否正確
-    const API = `https://api.github.com/repos/${REPO}/commits/main`;
-
+// ======== GitHub SHA 自動更新（最終穩定版） ========
+(async function autoUpdate() {
     try {
-        const localSHA = localStorage.getItem("app_sha") || "";
-        const response = await fetch(API + "?t=" + Date.now(), {
-            headers: { "Cache-Control": "no-cache" }
-        });
+        const api = "https://api.github.com/repos/HPLEE785/golf-score/commits/main";
 
-        const data = await response.json();
-        const remoteSHA = data.sha || "";
+        const res = await fetch(api, { cache: "no-store" });
+        if (!res.ok) return;
 
-        // 第一次開啟 → 記錄 SHA，不 reload
+        const json = await res.json();
+        const remoteSHA = json.sha;
+        const localSHA = localStorage.getItem("app_sha");
+
+        // 第一次啟動，儲存 SHA 不刷新
         if (!localSHA) {
             localStorage.setItem("app_sha", remoteSHA);
-            console.log("首次啟動, SHA 儲存:", remoteSHA);
             return;
         }
 
-        // 如果 SHA 不同，代表 Repo 更新 → 強制更新頁面
-        if (remoteSHA !== localSHA) {
-            console.log("偵測到新版，重新載入...");
+        // 有新版 → 重新載入
+        if (localSHA !== remoteSHA) {
             localStorage.setItem("app_sha", remoteSHA);
-
-            // 強制更新，不使用 cache
-            location.reload(true);
+            location.reload();
         }
+
     } catch (err) {
-        console.warn("更新檢查失敗:", err);
+        console.warn("GitHub 更新檢查失敗：", err);
+        // 重要：不能中斷後面程式
     }
 })();
 
@@ -148,5 +144,6 @@ function init() {
     }
 }
 init();
+
 
 
