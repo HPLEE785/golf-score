@@ -1,28 +1,30 @@
-// ======== GitHub Pages 自動更新（最終穩定版本，不會錯） ========
-(async function autoUpdateByETag() {
+// ======== GitHub Pages 強制更新檢查（iPhone WebApp 100% 可用） ========
+(async function autoUpdateBySize() {
     try {
-        const url = "index.html"; // 用首頁檔案偵測更新
-        const localTag = localStorage.getItem("etag_index") || "";
+        const url = "index.html";
+        const localSize = localStorage.getItem("page_size") || "";
 
-        // 向 GitHub Pages 要求最新的 ETag
-        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
-        const remoteTag = res.headers.get("ETag") || "";
+        // 用 GET 取得最新 index.html（避免快取）
+        const res = await fetch(url + "?v=" + Date.now(), { cache: "no-store" });
+        const text = await res.text();
 
-        // 第一次 → 儲存，不更新
-        if (!localTag) {
-            localStorage.setItem("etag_index", remoteTag);
+        const remoteSize = text.length.toString();  // 檔案字串長度（最穩定）
+
+        // 第一次啟動 → 儲存，不重載
+        if (!localSize) {
+            localStorage.setItem("page_size", remoteSize);
             return;
         }
 
-        // ETag 改變 → GitHub Pages 內容有更新
-        if (localTag !== remoteTag) {
+        // 有變 → 強制重載最新版本
+        if (localSize !== remoteSize) {
             console.log("偵測到新版，重新載入");
-            localStorage.setItem("etag_index", remoteTag);
+            localStorage.setItem("page_size", remoteSize);
             location.reload(true);
         }
 
-    } catch (err) {
-        console.warn("自動更新偵測失敗：", err);
+    } catch (e) {
+        console.warn("更新檢查失敗：", e);
     }
 })();
 
@@ -142,6 +144,7 @@ function init() {
     }
 }
 init();
+
 
 
 
