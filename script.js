@@ -1,30 +1,28 @@
-// ======== GitHub SHA 自動更新（最終穩定版） ========
-(async function autoUpdate() {
+// ======== GitHub Pages 自動更新（最終穩定版本，不會錯） ========
+(async function autoUpdateByETag() {
     try {
-        const api = "https://api.github.com/repos/HPLEE785/golf-score/commits/main";
+        const url = "index.html"; // 用首頁檔案偵測更新
+        const localTag = localStorage.getItem("etag_index") || "";
 
-        const res = await fetch(api, { cache: "no-store" });
-        if (!res.ok) return;
+        // 向 GitHub Pages 要求最新的 ETag
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        const remoteTag = res.headers.get("ETag") || "";
 
-        const json = await res.json();
-        const remoteSHA = json.sha;
-        const localSHA = localStorage.getItem("app_sha");
-
-        // 第一次啟動，儲存 SHA 不刷新
-        if (!localSHA) {
-            localStorage.setItem("app_sha", remoteSHA);
+        // 第一次 → 儲存，不更新
+        if (!localTag) {
+            localStorage.setItem("etag_index", remoteTag);
             return;
         }
 
-        // 有新版 → 重新載入
-        if (localSHA !== remoteSHA) {
-            localStorage.setItem("app_sha", remoteSHA);
-            location.reload();
+        // ETag 改變 → GitHub Pages 內容有更新
+        if (localTag !== remoteTag) {
+            console.log("偵測到新版，重新載入");
+            localStorage.setItem("etag_index", remoteTag);
+            location.reload(true);
         }
 
     } catch (err) {
-        console.warn("GitHub 更新檢查失敗：", err);
-        // 重要：不能中斷後面程式
+        console.warn("自動更新偵測失敗：", err);
     }
 })();
 
@@ -144,6 +142,7 @@ function init() {
     }
 }
 init();
+
 
 
 
