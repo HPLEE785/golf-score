@@ -30,7 +30,7 @@
 
 const HOLES = 18;
 
-const PLAYERS = ["Lee", "Joye", "陳振峯", "李子瑋", "趙振民","巫吉生","林振翰","吳建輝","張嘉原","陳威宇"];
+const PLAYERS = ["Lee", "Joye", "Jerry", "李子瑋", "趙振民","巫吉生","林振翰","吳建輝","張嘉原","陳威宇"];
 
 let currentSelect = 0;
 
@@ -144,6 +144,7 @@ function init() {
     }
 }
 init();
+
 
 
 
