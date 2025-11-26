@@ -1,6 +1,40 @@
+// ======== GitHub SHA 自動更新檢查 ========
+(async function autoUpdateByGitHub() {
+    const REPO = "HPLEE785/golf-score";   // ⚠ 請確認是否正確
+    const API = `https://api.github.com/repos/${REPO}/commits/main`;
+
+    try {
+        const localSHA = localStorage.getItem("app_sha") || "";
+        const response = await fetch(API + "?t=" + Date.now(), {
+            headers: { "Cache-Control": "no-cache" }
+        });
+
+        const data = await response.json();
+        const remoteSHA = data.sha || "";
+
+        // 第一次開啟 → 記錄 SHA，不 reload
+        if (!localSHA) {
+            localStorage.setItem("app_sha", remoteSHA);
+            console.log("首次啟動, SHA 儲存:", remoteSHA);
+            return;
+        }
+
+        // 如果 SHA 不同，代表 Repo 更新 → 強制更新頁面
+        if (remoteSHA !== localSHA) {
+            console.log("偵測到新版，重新載入...");
+            localStorage.setItem("app_sha", remoteSHA);
+
+            // 強制更新，不使用 cache
+            location.reload(true);
+        }
+    } catch (err) {
+        console.warn("更新檢查失敗:", err);
+    }
+})();
+
 const HOLES = 18;
 
-const PLAYERS = ["Lee", "洪忠宜", "陳振峯", "李子瑋", "趙振民","巫吉生","林振翰","吳建輝","張嘉原","陳威宇"];
+const PLAYERS = ["Lee", "Joye", "陳振峯", "李子瑋", "趙振民","巫吉生","林振翰","吳建輝","張嘉原","陳威宇"];
 
 let currentSelect = 0;
 
@@ -114,4 +148,5 @@ function init() {
     }
 }
 init();
+
 
