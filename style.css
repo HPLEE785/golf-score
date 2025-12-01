@@ -40,10 +40,10 @@ h1 {
 }
 
 .player-input input {
-    width: 200px;       /*❗ 人名輸入寬度 */ 
+    width: 160px;       /*❗ 人名輸入寬度 *  200,160/ 
     min-width: 0;
     flex-shrink: 0;
-    font-size: 28px;    /* ⭐ 這行控制玩家姓名字體大小 16,28*/
+    font-size: 20px;    /* ⭐ 這行控制玩家姓名字體大小 16,28*/
     padding: 4px 6px;   /* 可選，讓按起來更像 iPhone */
 }
 
@@ -177,6 +177,7 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
 
 
