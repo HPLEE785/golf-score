@@ -4,6 +4,9 @@ body {
     margin: 0;
     padding: 12px;
 }
+html, body {
+    -webkit-text-size-adjust: 100% !important;   /* 防止 iPhone 亂縮放文字 */
+}
 
 /* 標題 */
 h1 {
@@ -177,6 +180,7 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
 
 
