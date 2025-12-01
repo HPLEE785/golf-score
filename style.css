@@ -43,7 +43,7 @@ h1 {
     width: 120px;       /*❗ 人名輸入寬度 *  200,160,120/ 
     min-width: 0;
     flex-shrink: 0;
-    font-size: 24px;    /* ⭐ 這行控制玩家姓名字體大小 16,28,20,24*/
+    font-size: 26px;    /* ⭐ 這行控制玩家姓名字體大小 16,28,20,24,26*/
     padding: 4px 6px;   /* 可選，讓按起來更像 iPhone */
 }
 
@@ -177,6 +177,7 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
 
 
