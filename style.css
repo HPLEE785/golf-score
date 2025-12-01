@@ -33,14 +33,14 @@ h1 {
 }
 
 .player-input {
-    width: 240px;         /*❗ 人名輸入區最大不得超過此寬度 */
+    width: 160px;         /*❗ 人名輸入區最大不得超過此寬度 240,160*/
     display: flex;
     gap: 4px;
     flex-shrink: 0;       /*❗ 不允許被壓縮 */
 }
 
 .player-input input {
-    width: 160px;       /*❗ 人名輸入寬度 *  200,160/ 
+    width: 120px;       /*❗ 人名輸入寬度 *  200,160,120/ 
     min-width: 0;
     flex-shrink: 0;
     font-size: 20px;    /* ⭐ 這行控制玩家姓名字體大小 16,28*/
@@ -177,6 +177,7 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
 
 
