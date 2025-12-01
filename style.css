@@ -7,7 +7,7 @@ body {
 
 /* 標題 */
 h1 {
-    font-size: 22px;
+    font-size: 40px;
     text-align: center;
     margin: 6px 0 12px;
     font-weight: 600;
@@ -33,14 +33,14 @@ h1 {
 }
 
 .player-input {
-    width: 260px;         /*❗ 強制固定寬度 */
+    width: 120px;         /*❗ 人名輸入最大不得超過此寬度 */
     display: flex;
     gap: 4px;
     flex-shrink: 0;       /*❗ 不允許被壓縮 */
 }
 
 .player-input input {
-    width: 120px;         /* 可自行調整 */
+    width: 60px;         /* 人名輸入可自行調整 */
     min-width: 0;
     flex-shrink: 0;
 }
@@ -175,4 +175,5 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
