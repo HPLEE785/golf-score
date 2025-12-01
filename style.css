@@ -7,7 +7,7 @@ body {
 
 /* 標題 */
 h1 {
-    font-size: 14px;
+    font-size: 22px;
     text-align: center;
     margin: 6px 0 12px;
     font-weight: 600;
@@ -175,3 +175,4 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
