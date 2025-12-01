@@ -33,7 +33,7 @@ h1 {
 }
 
 .player-input {
-    width: 200px;         /*❗ 人名輸入區最大不得超過此寬度 240,160,200*/
+    width: 190px;         /*❗ 人名輸入區最大不得超過此寬度 240,160,200*/
     display: flex;
     gap: 4px;
     flex-shrink: 0;       /*❗ 不允許被壓縮 */
@@ -177,6 +177,7 @@ h1 {
     background: #e5f3ff;
     cursor: pointer;
 }
+
 
 
 
