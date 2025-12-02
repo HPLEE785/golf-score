@@ -2,80 +2,91 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>高爾夫記分卡 By Lee </title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- 避免重複 viewport，這裡整合成一行 -->
     <meta name="viewport" 
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <!-- iPhone 不自動縮放字體 -->
     <meta name="format-detection" content="telephone=no">
 
+    <!-- ⭐ 動態標題（JS 會自動填入） -->
+    <title id="pageTitle"></title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- iPhone 主畫面 icon -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- ⭐ 全域 APP 變數：只要改這裡，全站標題都會同步 -->
+    <script>
+        const APP_TITLE = "高爾夫記分卡 12/01 08:42";   // ← 只需改這裡！
+    </script>
 </head>
-<link rel="apple-touch-icon" href="icon-192.png">
+
 <body>
-    <h1>高爾夫記分卡 2025/12/02 08:30</h1>
 
-        
-        <!-- 玩家姓名輸入區 -->
-        <div class="player-setup">
-            <div class="player-input">
-                <input id="player1" type="text" placeholder="玩家1">
-                <button class="select-btn" onclick="openPlayerMenu(1)">▼</button>
-            </div>
+    <!-- ⭐ h1 動態標題（JS 自動填入） -->
+    <h1 id="mainTitle"></h1>
 
-            <div class="player-input">
-                <input id="player2" type="text" placeholder="玩家2">
-                <button class="select-btn" onclick="openPlayerMenu(2)">▼</button>
-            </div>
 
-            <div class="player-input">
-                <input id="player3" type="text" placeholder="玩家3">
-                <button class="select-btn" onclick="openPlayerMenu(3)">▼</button>
-            </div>
+    <!-- 玩家姓名輸入區 -->
+    <div class="player-setup">
 
-            <div class="player-input">
-                <input id="player4" type="text" placeholder="玩家4">
-                <button class="select-btn" onclick="openPlayerMenu(4)">▼</button>
-            </div>
+        <div class="player-input">
+            <input id="player1" type="text" placeholder="玩家1">
+            <button class="select-btn" onclick="openPlayerMenu(1)">▼</button>
         </div>
 
-        <!-- 表頭 -->
-        <div class="header-row">
-            <div>洞</div>
-            <div>Par</div>
-            <div>HDCP</div>
-            <div id="h_p1">P1</div>
-            <div id="h_p2">P2</div>
-            <div id="h_p3">P3</div>
-            <div id="h_p4">P4</div>
+        <div class="player-input">
+            <input id="player2" type="text" placeholder="玩家2">
+            <button class="select-btn" onclick="openPlayerMenu(2)">▼</button>
         </div>
 
-        <div id="hole-container"></div>
-
-        <div class="summary">
-            <div id="sumPar">總 Par：0</div>
-            <div id="sumScore1">P1：0</div>
-            <div id="sumScore2">P2：0</div>
-            <div id="sumScore3">P3：0</div>
-            <div id="sumScore4">P4：0</div>
+        <div class="player-input">
+            <input id="player3" type="text" placeholder="玩家3">
+            <button class="select-btn" onclick="openPlayerMenu(3)">▼</button>
         </div>
+
+        <div class="player-input">
+            <input id="player4" type="text" placeholder="玩家4">
+            <button class="select-btn" onclick="openPlayerMenu(4)">▼</button>
+        </div>
+
+    </div>
+
+
+    <!-- 表頭 -->
+    <div class="header-row">
+        <div>洞</div>
+        <div>Par</div>
+        <div>HDCP</div>
+        <div id="h_p1">P1</div>
+        <div id="h_p2">P2</div>
+        <div id="h_p3">P3</div>
+        <div id="h_p4">P4</div>
+    </div>
+
+    <div id="hole-container"></div>
+
+    <div class="summary">
+        <div id="sumPar">總 Par：0</div>
+        <div id="sumScore1">P1：0</div>
+        <div id="sumScore2">P2：0</div>
+        <div id="sumScore3">P3：0</div>
+        <div id="sumScore4">P4：0</div>
     </div>
 
     <!-- 玩家選單 -->
     <div id="playerMenu" class="menu hidden"></div>
 
     <script src="script.js"></script>
+
+    <!-- ⭐ 套用 APP_TITLE 到 title 與 h1 -->
+    <script>
+        document.getElementById("pageTitle").textContent = APP_TITLE;
+        document.getElementById("mainTitle").textContent = APP_TITLE;
+    </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
