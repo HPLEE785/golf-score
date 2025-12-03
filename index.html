@@ -2,64 +2,38 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="utf-8" />
-
-    <!-- 避免重複 viewport，這裡整合成一行 -->
-    <meta name="viewport" 
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-
-    <!-- iPhone 不自動縮放字體 -->
-    <meta name="format-detection" content="telephone=no">
-
-    <!-- ⭐ 動態標題（JS 會自動填入） -->
-    <title id="pageTitle"></title>
-
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>高爾夫記分卡</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- iPhone 主畫面 icon -->
-    <link rel="apple-touch-icon" href="icon-192.png">
-
-    <!-- ⭐ 全域 APP 變數：只要改這裡，全站標題都會同步 -->
-    <script>
-        const APP_TITLE = "高爾夫記分卡 12/01 08:42";   // ← 只需改這裡！
-    </script>
 </head>
 
 <body>
+    <h1>高爾夫記分卡</h1>
 
-    <!-- ⭐ h1 動態標題（JS 自動填入） -->
-    <h1 id="mainTitle"></h1>
+    <!-- 球場 + 分區設定 -->
+    <div class="course-row">
+        <label>球場：</label>
+        <select id="courseSelect" onchange="changeCourse()"></select>
 
+        <label>分區A：</label>
+        <button id="zoneA_btn" class="zone-btn" onclick="cycleZone('A')">A</button>
 
-    <!-- 玩家姓名輸入區 -->
-    <div class="player-setup">
-
-        <div class="player-input">
-            <input id="player1" type="text" placeholder="玩家1">
-            <button class="select-btn" onclick="openPlayerMenu(1)">▼</button>
-        </div>
-
-        <div class="player-input">
-            <input id="player2" type="text" placeholder="玩家2">
-            <button class="select-btn" onclick="openPlayerMenu(2)">▼</button>
-        </div>
-
-        <div class="player-input">
-            <input id="player3" type="text" placeholder="玩家3">
-            <button class="select-btn" onclick="openPlayerMenu(3)">▼</button>
-        </div>
-
-        <div class="player-input">
-            <input id="player4" type="text" placeholder="玩家4">
-            <button class="select-btn" onclick="openPlayerMenu(4)">▼</button>
-        </div>
-
+        <label>分區B：</label>
+        <button id="zoneB_btn" class="zone-btn" onclick="cycleZone('B')">B</button>
     </div>
 
+    <!-- 玩家姓名一組（按鈕） -->
+    <div class="player-setup">
+        <button id="p1_name" class="player-name" onclick="cyclePlayer(1)">P1</button>
+        <button id="p2_name" class="player-name" onclick="cyclePlayer(2)">P2</button>
+        <button id="p3_name" class="player-name" onclick="cyclePlayer(3)">P3</button>
+        <button id="p4_name" class="player-name" onclick="cyclePlayer(4)">P4</button>
+    </div>
 
-    <!-- 表頭 -->
+    <!-- 表頭：HOLE PAR HDCP P1 P2 P3 P4 -->
     <div class="header-row">
-        <div>洞</div>
-        <div>Par</div>
+        <div>HOLE</div>
+        <div>PAR</div>
         <div>HDCP</div>
         <div id="h_p1">P1</div>
         <div id="h_p2">P2</div>
@@ -67,9 +41,15 @@
         <div id="h_p4">P4</div>
     </div>
 
+    <!-- 前9洞 + 後9洞 -->
     <div id="hole-container"></div>
 
+    <!-- 第二組玩家姓名（9洞後顯示一次） -->
+    <div id="player-row-2" class="player-setup"></div>
+
+    <!-- Summary -->
     <div class="summary">
+        <div id="sumCourse">球場：</div>
         <div id="sumPar">總 Par：0</div>
         <div id="sumScore1">P1：0</div>
         <div id="sumScore2">P2：0</div>
@@ -77,16 +57,6 @@
         <div id="sumScore4">P4：0</div>
     </div>
 
-    <!-- 玩家選單 -->
-    <div id="playerMenu" class="menu hidden"></div>
-
     <script src="script.js"></script>
-
-    <!-- ⭐ 套用 APP_TITLE 到 title 與 h1 -->
-    <script>
-        document.getElementById("pageTitle").textContent = APP_TITLE;
-        document.getElementById("mainTitle").textContent = APP_TITLE;
-    </script>
-
 </body>
 </html>
