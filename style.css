@@ -1,197 +1,93 @@
 body {
-    font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
-    background: #ffd800;
-    margin: 0;
-    padding: 12px;
-}
-html, body {
-    -webkit-text-size-adjust: 100% !important;   /* 防止 iPhone 亂縮放文字 */
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    background: #fff4a8;
 }
 
-/* 標題 */
 h1 {
-    font-size: 32px;
-    text-align: center;
-    margin: 6px 0 12px;
-    font-weight: 600;
+    text-align: left;
 }
 
-/* 主卡片容器 */
-.card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-/* ------------------------------------------------------ */
-/* 玩家姓名輸入區：強制 4 欄同一行，不換行 */
-/* ------------------------------------------------------ */
-
-.player-setup {
+.course-row, .player-setup, .header-row {
     display: flex;
-    flex-wrap: nowrap;   /* ❗ 強制單行，不允許換行 */
-    gap: 6px;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 12px;
 }
 
-.player-input {
-    width: 190px;         /*❗ 人名輸入區最大不得超過此寬度 240,160,200*/
-    display: flex;
-    gap: 4px;
-    flex-shrink: 0;       /*❗ 不允許被壓縮 */
-}
-
-.player-input input {
-    width: 110px;       /*❗ 人名輸入寬度 *  200,160,120/ 
-    min-width: 0;
-    flex-shrink: 0;
-    font-size: 32px;    /* ⭐ 這行控制玩家姓名字體大小 16,28,20,24,26,32*/
-    padding: 4px 6px;   /* 可選，讓按起來更像 iPhone */
-}
-
-.select-btn {
-    width: 36px;
-    border: 1px solid #999;
-    border-radius: 6px;
-    background: #eee;
-    font-size: 28px;
-}
-
-/* ------------------------------------------------------ */
-/* 洞列、欄位固定寬度 */
-/* ------------------------------------------------------ */
-
-.header-row,
-.row {
-    display: grid;
-    grid-template-columns: 40px 50px 50px repeat(4, 60px);
-    /* 洞 / Par / HDCP / 玩家1~4 */
-    align-items: center;
-    justify-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-}
-
-/* 防止 Grid 被內容撐開 */
-.header-row > *,
-.row > * {
-    min-width: 0 !important;
-    overflow: hidden;
-}
-
-/* 標題列 */
-.header-row {
-    font-weight: bold;
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 6px;
-}
-
-/* 每洞分隔線 */
-.row {
-    padding: 6px 0;
-    border-bottom: 1px solid #e5e5e5;
-}
-
-/* ------------------------------------------------------ */
-/* 玩家按鈕 */
-/* ------------------------------------------------------ */
-
-.player-btn {
-    width: 50px;
-    height: 42px;
-    min-width: 50px;
-    min-height: 42px;
-    padding: 0;
-    margin: 0;
-    line-height: 42px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 18px;
-    background: #f0f0f0;
-    border: 2px solid #aaa;
-    border-radius: 8px;
-
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    transition: 0.1s;
-}
-
-.player-btn:active {
-    transform: scale(0.92);
-}
-
-/* ------------------------------------------------------ */
-/* 成績色碼（依差值套用） */
-/* ------------------------------------------------------ */
-
-.score-par     { background: #dcdcdc !important; }
-.score-birdie  { background: #8fff8f !important; }
-.score-eagle   { background: #8fd1ff !important; }
-.score-alb     { background: #d59bff !important; }
-.score-condor  { background: gold !important; }
-.score-bogey   { background: #ffb4b4 !important; }
-.score-db      { background: #ff7e7e !important; }
-
-/* ------------------------------------------------------ */
-/* SUMMARY 區 */
-/* ------------------------------------------------------ */
-
-.summary {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid #ccc;
-    font-size: 14px;
-}
-
-/* ------------------------------------------------------ */
-/* 玩家選單（下拉） */
-/* ------------------------------------------------------ */
-
-.menu {
-    position: absolute;
-    background: #fff;
-    border: 1px solid #aaa;
-    border-radius: 6px;
-    padding: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    z-index: 999;
-}
-
-.menu.hidden {
-    display: none;
-}
-
-.menu div {
-    padding: 6px;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
-}
-
-.menu div:last-child {
-    border-bottom: none;
-}
-
-.menu div:hover {
-    background: #e5f3ff;
+/* 玩家與分區按鈕 */
+.player-name, .zone-btn {
+    padding: 8px 14px;
+    font-size: 20px;
+    border-radius: 12px;
+    background: white;
     cursor: pointer;
 }
 
+/* HOLE PAR HDCP 表頭 */
+.header-row {
+    font-weight: bold;
+    padding: 8px 0;
+    border-bottom: 2px solid #ccc;
+}
 
+.header-row div {
+    width: 70px;
+}
 
+/* 每洞資料列 */
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+}
 
+.row div {
+    width: 70px;
+    font-size: 20px;
+}
 
+/* 分數按鈕 */
+.score-btn {
+    width: 60px;
+    height: 40px;
+    font-size: 22px;
+    border-radius: 10px;
+    border: 2px solid #999;
+    background: white;
+    cursor: pointer;
+}
 
+/* 單紅框（Birdie：PAR-1） */
+.score-birdie {
+    border: 2px solid red !important;
+    border-radius: 20px;
+}
 
+/* 單藍框（Bogey：PAR+1） */
+.score-bogey {
+    border: 2px solid #2980ff !important;
+    border-radius: 20px;
+}
 
+/* 雙紅框（Eagle/Albatross） */
+.score-eagle,
+.score-alb {
+    box-shadow: 0 0 0 4px rgba(255,0,0,0.6);
+    border: 2px solid red !important;
+    border-radius: 20px;
+}
 
+/* 雙藍框（Double Bogey+） */
+.score-db {
+    box-shadow: 0 0 0 4px rgba(41,128,255,0.6);
+    border: 2px solid #2980ff !important;
+    border-radius: 20px;
+}
 
-
-
-
-
-
+.summary {
+    margin-top: 20px;
+    font-size: 20px;
+}
