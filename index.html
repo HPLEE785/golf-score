@@ -1,62 +1,1210 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>高爾夫記分卡</title>
-    <link rel="stylesheet" href="style.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>高爾夫分數紀錄卡 - 讓桿提示版</title>
+        <style>
+                body 
+                {
+                        font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+                        background-color: #f4f7f6;
+                        padding: 20px;
+                        padding-bottom: 100px;
+                        user-select: none;
+                }
+
+                .main-controls 
+                {
+                        max-width: 95%; 
+                        margin: 0 auto 20px auto;
+                        background: #fff;
+                        padding: 15px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: 15px;
+                        font-size: 1.1em;
+                }
+
+                .control-group
+                {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                }
+
+                .label-text 
+                {
+                        font-weight: bold;
+                        color: #333;
+                }
+
+                .action-btn 
+                {
+                        background-color: #2c3e50;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        font-size: 0.95em;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                }
+                .action-btn:hover 
+                {
+                        background-color: #34495e;
+                }
+
+                .zone-select-btn
+                {
+                        background-color: #27ae60;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-weight: bold;
+                        cursor: pointer;
+                }
+                .zone-select-btn:hover
+                {
+                        background-color: #2ecc71;
+                }
+
+                .btn-reset 
+                {
+                        background-color: #7f8c8d;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 0.95em;
+                        font-weight: bold;
+                        margin-left: auto;
+                }
+                .btn-reset:hover 
+                {
+                        background-color: #c0392b;
+                }
+
+                .card-container 
+                {
+                        max-width: 98%; 
+                        margin: 0 auto;
+                        background: white;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        border-radius: 8px;
+                        overflow: hidden;
+                        margin-bottom: 20px;
+                        overflow-x: auto;
+                }
+
+                .zone-header 
+                {
+                        background-color: #27ae60;
+                        color: white;
+                        padding: 10px 15px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        font-size: 1.1em;
+                        font-weight: bold;
+                        min-width: max-content;
+                }
+
+                table 
+                {
+                        width: 100%;
+                        border-collapse: collapse;
+                        text-align: center;
+                        table-layout: auto; 
+                        min-width: 1200px; 
+                }
+                
+                th, td 
+                {
+                        border: 1px solid #ddd;
+                        padding: 6px 4px;
+                        vertical-align: top;
+                        white-space: nowrap; 
+                } 
+                
+                th 
+                {
+                        background-color: #ecf0f1;
+                        font-weight: bold;
+                        color: #333;
+                }
+
+                .hole-col { width: 40px; background: #e8f5e9; font-weight: bold; vertical-align: middle;}
+                .par-col { width: 40px; vertical-align: middle;}
+                .hdcp-col { width: 40px; vertical-align: middle;}
+
+                .player-header {
+                        min-width: 90px; 
+                }
+
+                .player-name-btn 
+                {
+                        background: none;
+                        border: 1px solid transparent;
+                        font-size: 1.1em;
+                        font-weight: bold;
+                        color: #2c3e50;
+                        cursor: pointer;
+                        padding: 5px;
+                        width: 100%;
+                        border-radius: 4px;
+                        display: block;
+                        margin-bottom: 5px;
+                        min-height: 32px; 
+                }
+                .player-name-btn:hover 
+                {
+                        background-color: #dfe6e9;
+                        border-color: #b2bec3;
+                }
+
+                .handicap-btn 
+                {
+                        display: inline-block;
+                        background-color: #e8f4f8;
+                        border: 1px solid #b3d7ff;
+                        color: #0056b3;
+                        font-size: 0.9em;
+                        padding: 2px 8px;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        height: 24px;
+                        line-height: 20px;
+                        box-sizing: border-box;
+                }
+
+                .handicap-placeholder 
+                {
+                        display: inline-block;
+                        height: 24px;
+                        width: 100%;
+                        visibility: hidden;
+                }
+
+                .stats-container 
+                {
+                        display: flex;
+                        justify-content: center;
+                        gap: 2px;
+                        margin-top: 5px;
+                        padding-top: 5px;
+                        border-top: 1px dashed #bdc3c7;
+                }
+                
+                .stats-btn 
+                {
+                        width: 30px;
+                        height: 24px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        border-radius: 4px;
+                        border: 1px solid #bdc3c7;
+                        background-color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: default;
+                }
+
+                .stats-ba { color: #e74c3c; border-color: #e74c3c; }
+                .stats-bb { color: #2980b9; border-color: #2980b9; }
+                .stats-bb.negative { color: red; }
+                .stats-bb.positive { color: blue; }
+
+                .score-btn 
+                {
+                        width: 50px;
+                        height: 45px;
+                        font-size: 20px;
+                        font-weight: bold;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        margin-bottom: 5px;
+                        transition: all 0.1s;
+                        background-color: #fff;
+                        border: 1px dashed #ccc;
+                        color: #ccc;
+                }
+                .score-btn:active { transform: scale(0.95); }
+
+                .score-btn.style-par { border: 1px solid #7f8c8d; color: #2c3e50; background-color: #fff; }
+                .score-btn.style-bogey { border: 2px solid #000; color: #000; background-color: #fff; border-radius: 0; }
+                .score-btn.style-double-bogey { border: 2px solid #000; color: #000; background-color: #fff; border-radius: 0; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
+                .score-btn.style-birdie { border: 2px solid red; color: red; background-color: #fff; border-radius: 50%; }
+                .score-btn.style-eagle { border: 2px solid red; color: red; background-color: #fff; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
+
+                .sub-btn-container 
+                {
+                        display: flex;
+                        justify-content: center;
+                        gap: 2px;
+                        height: 30px;
+                }
+
+                .btn-ba 
+                {
+                        width: 25px; 
+                        height: 30px;
+                        background-color: #fff;
+                        border: 1px solid #999;
+                        border-radius: 4px;
+                        font-weight: bold;
+                        color: #e74c3c;
+                        cursor: pointer;
+                        font-size: 14px;
+                        padding: 0;
+                }
+                .btn-ba.active-bg { background-color: #dcedc8; border-color: #8bc34a; }
+
+                .btn-bb 
+                {
+                        width: 25px;
+                        height: 30px;
+                        background-color: #f9f9f9; 
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        font-weight: bold;
+                        font-size: 12px;
+                        padding: 0;
+                        pointer-events: none; 
+                }
+                .btn-bb.win { color: blue; }
+                .btn-bb.lose { color: red; }
+                
+                /* 新增：符合讓桿條件時的背景色 (淡紅色) */
+                .btn-bb.handicap-applied 
+                {
+                        background-color: #ffe0e0 !important; 
+                        border-color: #ffcccc !important;
+                }
+
+                /* === 自定義 Modal 樣式 === */
+                .modal-overlay 
+                {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        display: none;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
+                }
+                .modal-box 
+                {
+                        background: white;
+                        padding: 25px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        text-align: center;
+                        max-width: 400px;
+                        width: 90%;
+                }
+                .modal-title 
+                {
+                        font-size: 1.2em;
+                        font-weight: bold;
+                        margin-bottom: 15px;
+                        color: #c0392b;
+                }
+                .modal-desc 
+                {
+                        margin-bottom: 20px;
+                        color: #555;
+                }
+                .modal-buttons 
+                {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                }
+                .modal-btn 
+                {
+                        padding: 10px;
+                        border: none;
+                        border-radius: 5px;
+                        font-size: 1em;
+                        cursor: pointer;
+                }
+                .btn-keep { background-color: #2980b9; color: white; }
+                .btn-clear { background-color: #e67e22; color: white; }
+                .btn-cancel { background-color: #95a5a6; color: white; }
+                
+        </style>
 </head>
-
 <body>
-    <h1>高爾夫記分卡</h1>
 
-    <!-- 球場 + 分區設定 -->
-    <div class="course-row">
-        <label>球場：</label>
-        <select id="courseSelect" onchange="changeCourse()"></select>
+        <div class="main-controls">
+                <div class="control-group">
+                        <span class="label-text">球場 : </span>
+                        <button id="course-selector" class="action-btn" onclick="toggleCourse()">台中國際</button>
+                </div>
 
-        <label>分區A：</label>
-        <button id="zoneA_btn" class="zone-btn" onclick="cycleZone('A')">A</button>
+                <div class="control-group">
+                        <span class="label-text">前 9 球道 : </span>
+                        <button id="zone-select-btn-1" class="zone-select-btn" onclick="tryToggleZone(1)">--</button>
+                </div>
 
-        <label>分區B：</label>
-        <button id="zoneB_btn" class="zone-btn" onclick="cycleZone('B')">B</button>
-    </div>
+                <div class="control-group">
+                        <span class="label-text">後 9 球道 : </span>
+                        <button id="zone-select-btn-2" class="zone-select-btn" onclick="tryToggleZone(2)">--</button>
+                </div>
 
-    <!-- 玩家姓名一組（按鈕） -->
-    <div class="player-setup">
-        <button id="p1_name" class="player-name" onclick="cyclePlayer(1)">P1</button>
-        <button id="p2_name" class="player-name" onclick="cyclePlayer(2)">P2</button>
-        <button id="p3_name" class="player-name" onclick="cyclePlayer(3)">P3</button>
-        <button id="p4_name" class="player-name" onclick="cyclePlayer(4)">P4</button>
-    </div>
+                <button class="btn-reset" onclick="resetAllData()">⚠️ 清除紀錄</button>
+        </div>
 
-    <!-- 表頭：HOLE PAR HDCP P1 P2 P3 P4 -->
-    <div class="header-row">
-        <div>HOLE</div>
-        <div>PAR</div>
-        <div>HDCP</div>
-        <div id="h_p1">P1</div>
-        <div id="h_p2">P2</div>
-        <div id="h_p3">P3</div>
-        <div id="h_p4">P4</div>
-    </div>
+        <div class="card-container">
+                <div class="zone-header">
+                        <span id="zone-label-1">球道選擇 (前 9)</span>
+                </div>
+                <table>
+                        <thead><tr id="header-1"></tr></thead>
+                        <tbody id="body-1"></tbody>
+                </table>
+        </div>
 
-    <!-- 前9洞 + 後9洞 -->
-    <div id="hole-container"></div>
+        <div class="card-container">
+                <div class="zone-header">
+                        <span id="zone-label-2">球道選擇 (後 9)</span>
+                </div>
+                <table>
+                        <thead><tr id="header-2"></tr></thead>
+                        <tbody id="body-2"></tbody>
+                </table>
+        </div>
 
-    <!-- 第二組玩家姓名（9洞後顯示一次） -->
-    <div id="player-row-2" class="player-setup"></div>
+        <div id="zone-modal" class="modal-overlay">
+                <div class="modal-box">
+                        <div class="modal-title">⚠️ 該球道已有資料</div>
+                        <div class="modal-desc">您即將切換球道，但目前的球道已經有輸入分數。請選擇處理方式：</div>
+                        <div class="modal-buttons">
+                                <button class="modal-btn btn-keep" onclick="handleZoneModal(1)">[1] 更改球道 (保留資料)</button>
+                                <button class="modal-btn btn-clear" onclick="handleZoneModal(2)">[2] 更改球道 (清除資料)</button>
+                                <button class="modal-btn btn-cancel" onclick="handleZoneModal(3)">[3] 放棄離開</button>
+                        </div>
+                </div>
+        </div>
 
-    <!-- Summary -->
-    <div class="summary">
-        <div id="sumCourse">球場：</div>
-        <div id="sumPar">總 Par：0</div>
-        <div id="sumScore1">P1：0</div>
-        <div id="sumScore2">P2：0</div>
-        <div id="sumScore3">P3：0</div>
-        <div id="sumScore4">P4：0</div>
-    </div>
+        <script>
+        // ==========================================
+        //  設定與資料
+        // ==========================================
 
-    <script src="script.js"></script>
+        const playerNames = [
+                "陳志明", "林雅婷", "張家豪", "王淑芬", 
+                "李建國", "黃怡君", "吳冠宇", "劉欣怡",
+                "張志強", "王曉梅", "陳冠宇", "林怡岑"
+        ];
+        
+        const STORAGE_KEY = 'golf_scorecard_v18_hdcp_color';
+        
+        let lastBaClickTime = 0;
+        let pendingZoneChange = null;
+
+        const COURSE_DATA = 
+        {
+                "台中國際": 
+                {
+                        zones: 
+                        {
+                                "東區": { par: [4,4,3,5,4,4,3,5,4], hdcp: [2,8,5,4,7,1,9,3,6] },
+                                "中區": { par: [4,4,3,5,4,4,3,4,5], hdcp: [7,2,8,5,4,1,9,3,6] },
+                                "西區": { par: [5,4,3,4,4,3,4,5,4], hdcp: [3,6,9,8,1,4,7,2,5] }
+                        }
+                },
+                "豐原球場": 
+                {
+                        zones: 
+                        {
+                                "OUT": { par: [4,5,5,3,4,4,3,4,3], hdcp: [5,3,7,15,1,9,17,11,13] },
+                                "IN": { par: [5,3,4,3,4,3,5,4,5], hdcp: [4,18,2,16,10,14,12,6,8] }
+                        }
+                }
+        };
+
+        let currentCourseName = "台中國際";
+        let currentZone1 = "東區"; 
+        let currentZone2 = "西區";
+
+        // ==========================================
+        //  球道切換邏輯
+        // ==========================================
+
+        function tryToggleZone(tableId)
+        {
+                const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
+                let currentZone = (tableId === 1) ? currentZone1 : currentZone2;
+                let idx = zones.indexOf(currentZone);
+                let nextIdx = (idx + 1) % zones.length;
+                let nextZone = zones[nextIdx];
+
+                if (hasDataInTable(tableId))
+                {
+                        pendingZoneChange = { tableId: tableId, nextZone: nextZone };
+                        document.getElementById('zone-modal').style.display = 'flex';
+                }
+                else
+                {
+                        applyZoneChange(tableId, nextZone, false);
+                }
+        }
+
+        function hasDataInTable(tableId)
+        {
+                for (let r = 0; r < 9; r++)
+                {
+                        for (let p = 1; p <= playerNames.length; p++)
+                        {
+                                let scoreBtn = document.getElementById(`table${tableId}-row${r}-p${p}-score`);
+                                if (scoreBtn && scoreBtn.innerText !== "")
+                                {
+                                        return true;
+                                }
+                        }
+                }
+                return false;
+        }
+
+        function handleZoneModal(option)
+        {
+                const modal = document.getElementById('zone-modal');
+                modal.style.display = 'none';
+
+                if (!pendingZoneChange) return;
+
+                const { tableId, nextZone } = pendingZoneChange;
+
+                if (option === 1) 
+                {
+                        applyZoneChange(tableId, nextZone, false);
+                }
+                else if (option === 2)
+                {
+                        applyZoneChange(tableId, nextZone, true);
+                }
+                else if (option === 3)
+                {
+                        pendingZoneChange = null;
+                }
+        }
+
+        function applyZoneChange(tableId, nextZone, shouldClear)
+        {
+                if (tableId === 1) currentZone1 = nextZone;
+                else currentZone2 = nextZone;
+
+                renderTable(tableId, (tableId === 1) ? currentZone1 : currentZone2);
+
+                if (shouldClear)
+                {
+                        clearTableData(tableId);
+                }
+                else
+                {
+                        loadInputValues();
+                        updateAllBBCalculations();
+                }
+
+                updateZoneLabels();
+                saveData();
+                pendingZoneChange = null;
+        }
+
+        function clearTableData(tableId)
+        {
+                for (let r = 0; r < 9; r++)
+                {
+                        for (let p = 1; p <= playerNames.length; p++)
+                        {
+                                let scoreBtn = document.getElementById(`table${tableId}-row${r}-p${p}-score`);
+                                if (scoreBtn) 
+                                {
+                                        scoreBtn.innerText = "";
+                                        scoreBtn.className = "score-btn"; 
+                                }
+                                
+                                let baBtn = document.getElementById(`table${tableId}-row${r}-p${p}-ba`);
+                                if (baBtn) 
+                                {
+                                        baBtn.innerText = "";
+                                        baBtn.classList.remove('active-bg');
+                                        baBtn.style.backgroundColor = '#fff';
+                                }
+
+                                let bbBtn = document.getElementById(`table${tableId}-row${r}-p${p}-bb`);
+                                if (bbBtn) 
+                                {
+                                        bbBtn.innerText = "";
+                                        bbBtn.classList.remove('win', 'lose');
+                                }
+                        }
+                }
+                updateTotals();
+        }
+
+        function updateZoneLabels()
+        {
+                document.getElementById('zone-select-btn-1').innerText = currentZone1;
+                document.getElementById('zone-select-btn-2').innerText = currentZone2;
+                
+                document.getElementById('zone-label-1').innerText = `球道選擇 (前 9): ${currentZone1}`;
+                document.getElementById('zone-label-2').innerText = `球道選擇 (後 9): ${currentZone2}`;
+        }
+
+
+        // ==========================================
+        //  統計邏輯
+        // ==========================================
+        
+        function updateTotals()
+        {
+                let count = playerNames.length;
+                let baCounts = new Array(count).fill(0);
+                let bbSums = new Array(count).fill(0);
+
+                for (let t = 1; t <= 2; t++)
+                {
+                        for (let r = 0; r < 9; r++)
+                        {
+                                for (let pIndex = 0; pIndex < count; pIndex++)
+                                { 
+                                        let pNum = pIndex + 1;
+                                        
+                                        if (pIndex < 4) 
+                                        {
+                                                const baBtn = document.getElementById(`table${t}-row${r}-p${pNum}-ba`);
+                                                if (baBtn && baBtn.innerText === "O")
+                                                {
+                                                        baCounts[pIndex]++;
+                                                }
+                                        }
+
+                                        if (pNum > 1)
+                                        {
+                                                const bbBtn = document.getElementById(`table${t}-row${r}-p${pNum}-bb`);
+                                                if (bbBtn)
+                                                {
+                                                        let val = parseInt(bbBtn.innerText);
+                                                        if (!isNaN(val))
+                                                        {
+                                                                bbSums[pIndex] += val;
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+
+                let p1Total = 0;
+                for (let i = 1; i < 4; i++) // 只計算同組的 P2-P4
+                {
+                        p1Total -= bbSums[i];
+                }
+                bbSums[0] = p1Total;
+
+                for (let t = 1; t <= 2; t++)
+                {
+                        for (let pIndex = 0; pIndex < count; pIndex++)
+                        {
+                                let pNum = pIndex + 1;
+                                
+                                if (pIndex < 4)
+                                {
+                                        const totalBaEl = document.getElementById(`table${t}-total-ba-p${pNum}`);
+                                        if (totalBaEl)
+                                        {
+                                                totalBaEl.innerText = baCounts[pIndex];
+                                        }
+                                }
+
+                                const totalBbEl = document.getElementById(`table${t}-total-bb-p${pNum}`);
+                                if (totalBbEl)
+                                {
+                                        let sum = bbSums[pIndex];
+                                        let displayStr = sum > 0 ? `+${sum}` : `${sum}`;
+                                        if (sum === 0) displayStr = "0";
+                                        
+                                        totalBbEl.innerText = displayStr;
+
+                                        totalBbEl.classList.remove('positive', 'negative');
+                                        if (sum > 0) totalBbEl.classList.add('positive');
+                                        if (sum < 0) totalBbEl.classList.add('negative');
+                                }
+                        }
+                }
+        }
+
+        // ==========================================
+        //  核心邏輯 (BB 計算)
+        // ==========================================
+
+        function updateAllBBCalculations()
+        {
+                [1, 2].forEach(tableId => 
+                {
+                        const zoneName = (tableId === 1) ? currentZone1 : currentZone2;
+                        const zoneData = COURSE_DATA[currentCourseName].zones[zoneName];
+
+                        for (let r = 0; r < 9; r++)
+                        {
+                                const holePar = zoneData.par[r];
+                                const holeHdcp = zoneData.hdcp[r];
+
+                                const p1ScoreBtn = document.getElementById(`table${tableId}-row${r}-p1-score`);
+                                const p1ScoreVal = parseInt(p1ScoreBtn.innerText);
+
+                                if (isNaN(p1ScoreVal))
+                                {
+                                        // P1 分數未填時，仍需判斷讓桿並顯示底色
+                                        for (let p = 2; p <= playerNames.length; p++)
+                                        {
+                                                const hdcpBtn = document.getElementById(`table${tableId}-hdcp-p${p}`);
+                                                let hdcpSetting = parseInt(hdcpBtn.innerText.replace('讓 ', ''));
+                                                let isHdcp = (holeHdcp <= hdcpSetting);
+                                                
+                                                updateBBDisplay(tableId, r, p, "", isHdcp);
+                                        }
+                                        continue;
+                                }
+
+                                for (let p = 2; p <= playerNames.length; p++)
+                                {
+                                        const pScoreBtn = document.getElementById(`table${tableId}-row${r}-p${p}-score`);
+                                        const pScoreVal = parseInt(pScoreBtn.innerText);
+
+                                        const hdcpBtn = document.getElementById(`table${tableId}-hdcp-p${p}`);
+                                        let hdcpSetting = parseInt(hdcpBtn.innerText.replace('讓 ', ''));
+                                        
+                                        let isHdcp = (holeHdcp <= hdcpSetting);
+
+                                        if (isNaN(pScoreVal))
+                                        {
+                                                updateBBDisplay(tableId, r, p, "", isHdcp);
+                                                continue;
+                                        }
+
+                                        let netScore = pScoreVal;
+                                        if (isHdcp)
+                                        {
+                                                netScore -= 1;
+                                        }
+
+                                        let diffStr = "";
+                                        if (netScore < p1ScoreVal)
+                                        {
+                                                let isBonus = (pScoreVal < holePar);
+                                                let points = isBonus ? 2 : 1;
+                                                diffStr = `+${points}`;
+                                        }
+                                        else if (netScore > p1ScoreVal)
+                                        {
+                                                let isBonus = (p1ScoreVal < holePar);
+                                                let points = isBonus ? 2 : 1;
+                                                diffStr = `-${points}`;
+                                        }
+                                        else
+                                        {
+                                                diffStr = "";
+                                        }
+
+                                        updateBBDisplay(tableId, r, p, diffStr, isHdcp);
+                                }
+                        }
+                });
+                
+                updateTotals();
+        }
+
+        function updateBBDisplay(tableId, rowIndex, playerIndex, text, isHdcp)
+        {
+                const bbBtn = document.getElementById(`table${tableId}-row${rowIndex}-p${playerIndex}-bb`);
+                if (bbBtn)
+                {
+                        bbBtn.innerText = text;
+                        bbBtn.classList.remove('win', 'lose', 'handicap-applied');
+                        
+                        if (text.startsWith('+')) bbBtn.classList.add('win');
+                        if (text.startsWith('-')) bbBtn.classList.add('lose');
+                        
+                        if (isHdcp)
+                        {
+                                bbBtn.classList.add('handicap-applied');
+                        }
+                }
+        }
+
+        // ==========================================
+        //  介面操作
+        // ==========================================
+
+        function toggleCourse()
+        {
+                const courses = Object.keys(COURSE_DATA);
+                let idx = courses.indexOf(currentCourseName);
+                let nextIdx = (idx + 1) % courses.length;
+                currentCourseName = courses[nextIdx];
+                const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
+                currentZone1 = zones[0];
+                currentZone2 = zones.length > 1 ? zones[1] : zones[0];
+                renderAll();
+                saveData();
+        }
+
+        function updateScoreVisual(btn, scoreVal, parVal)
+        {
+                btn.classList.remove('style-par', 'style-bogey', 'style-double-bogey', 'style-birdie', 'style-eagle');
+                if (isNaN(scoreVal)) return;
+                
+                const diff = scoreVal - parVal;
+                
+                if (diff === 0)
+                {
+                        btn.classList.add('style-par');
+                }
+                else if (diff === 1)
+                {
+                        btn.classList.add('style-bogey');
+                }
+                else if (diff >= 2)
+                {
+                        btn.classList.add('style-double-bogey');
+                }
+                else if (diff === -1)
+                {
+                        btn.classList.add('style-birdie');
+                }
+                else if (diff <= -2)
+                {
+                        btn.classList.add('style-eagle');
+                }
+        }
+
+        function handleScoreClick(btn, par)
+        {
+                let text = btn.innerText;
+                let nextVal;
+                
+                if (text === "")
+                {
+                        nextVal = par;
+                }
+                else
+                {
+                        let currentVal = parseInt(text);
+                        let maxLimit = Math.min(par * 2, 9);
+                        nextVal = currentVal + 1;
+                        if (nextVal > maxLimit) nextVal = 1;
+                }
+                
+                btn.innerText = nextVal;
+                updateScoreVisual(btn, nextVal, par);
+                updateAllBBCalculations();
+                saveData();
+        }
+
+        function handleBAClick(tableId, rowIndex, playerIndex)
+        {
+                if (playerIndex >= 4) return;
+
+                const now = Date.now();
+                if (now - lastBaClickTime < 250) 
+                {
+                        return;
+                }
+                lastBaClickTime = now;
+
+                let clickedPlayerNameBtn = document.getElementById(`table${tableId}-p${playerIndex+1}-name`);
+                if (!clickedPlayerNameBtn || clickedPlayerNameBtn.innerText === "")
+                {
+                        return;
+                }
+
+                for (let i = 0; i < 4; i++)
+                {
+                        let pNum = i + 1;
+                        let nameBtn = document.getElementById(`table${tableId}-p${pNum}-name`);
+                        let name = nameBtn ? nameBtn.innerText : "";
+                        
+                        if (name !== "")
+                        {
+                                let scoreBtn = document.getElementById(`table${tableId}-row${rowIndex}-p${pNum}-score`);
+                                let score = scoreBtn ? scoreBtn.innerText : "";
+                                
+                                if (score === "")
+                                {
+                                        return;
+                                }
+                        }
+                }
+
+                const rowButtons = [];
+                for (let i = 0; i < 4; i++)
+                {
+                        let btnId = `table${tableId}-row${rowIndex}-p${i+1}-ba`;
+                        rowButtons.push(document.getElementById(btnId));
+                }
+                
+                const clickedBtn = rowButtons[playerIndex];
+                const isCurrentlyO = clickedBtn.innerText === "O";
+                
+                rowButtons.forEach(btn => btn.innerText = "");
+                
+                if (!isCurrentlyO)
+                {
+                        clickedBtn.innerText = "O";
+                }
+                
+                updateRowBackground(tableId, rowIndex);
+                updateTotals();
+                saveData();
+        }
+
+        function updateRowBackground(tableId, rowIndex)
+        {
+                let hasO = false;
+                const rowButtons = [];
+                
+                for (let i = 0; i < 4; i++)
+                {
+                        let btn = document.getElementById(`table${tableId}-row${rowIndex}-p${i+1}-ba`);
+                        if (btn)
+                        {
+                                rowButtons.push(btn);
+                                if (btn.innerText === "O") hasO = true;
+                        }
+                }
+                
+                rowButtons.forEach(btn => 
+                {
+                        if (hasO)
+                        {
+                                btn.classList.add("active-bg");
+                                btn.style.backgroundColor = "#dcedc8"; 
+                        }
+                        else
+                        {
+                                btn.classList.remove("active-bg");
+                                btn.style.backgroundColor = "#fff"; 
+                        }
+                });
+        }
+
+        function handleHdcpClick(btn)
+        {
+                let num = parseInt(btn.innerText.replace('讓 ', ''));
+                let next = (num + 1) > 9 ? 0 : num + 1;
+                btn.innerText = `讓 ${next}`;
+                updateAllBBCalculations();
+                saveData();
+        }
+
+        function handleNameClick(btn)
+        {
+                let idParts = btn.id.split('-');
+                let pNumPart = idParts[1]; 
+                let pNum = parseInt(pNumPart.replace('p', ''));
+                
+                let hasScore = false;
+                for (let t = 1; t <= 2; t++)
+                {
+                        for (let r = 0; r < 9; r++)
+                        {
+                                const scoreBtn = document.getElementById(`table${t}-row${r}-p${pNum}-score`);
+                                if (scoreBtn && scoreBtn.innerText !== "")
+                                {
+                                        hasScore = true;
+                                        break;
+                                }
+                        }
+                        if (hasScore) break;
+                }
+
+                if (hasScore)
+                {
+                        if (!confirm("該玩家已有輸入分數，確定要變更名字嗎？"))
+                        {
+                                return; 
+                        }
+                }
+
+                let currentName = btn.innerText;
+                let idx = playerNames.indexOf(currentName);
+                
+                if (idx === -1)
+                {
+                        btn.innerText = playerNames[0];
+                }
+                else if (idx === playerNames.length - 1)
+                {
+                        btn.innerText = "";
+                }
+                else
+                {
+                        btn.innerText = playerNames[idx + 1];
+                }
+                
+                saveData();
+        }
+
+        // ==========================================
+        //  渲染與儲存
+        // ==========================================
+
+        function renderAll()
+        {
+                document.getElementById('course-selector').innerText = currentCourseName;
+                updateZoneLabels();
+
+                renderTable(1, currentZone1);
+                renderTable(2, currentZone2);
+
+                loadInputValues();
+        }
+
+        function renderTable(tableId, zoneName)
+        {
+                const headerRow = document.getElementById(`header-${tableId}`);
+                const body = document.getElementById(`body-${tableId}`);
+                headerRow.innerHTML = '';
+                body.innerHTML = '';
+
+                const zoneData = COURSE_DATA[currentCourseName].zones[zoneName];
+                let startHole = (currentCourseName === "豐原球場" && zoneName === "IN") ? 10 : 1;
+
+                headerRow.innerHTML = `<th class="hole-col">Hole</th><th class="par-col">PAR</th><th class="hdcp-col">HDCP</th>`;
+                
+                for (let i = 0; i < playerNames.length; i++)
+                {
+                        const th = document.createElement('th');
+                        th.className = 'player-header';
+                        
+                        const nameBtn = document.createElement('button');
+                        nameBtn.className = 'player-name-btn';
+                        nameBtn.innerText = playerNames[i] || `玩家${i+1}`;
+                        nameBtn.id = `table${tableId}-p${i+1}-name`;
+                        nameBtn.onclick = function() { handleNameClick(this); };
+                        th.appendChild(nameBtn);
+
+                        if (i === 0)
+                        {
+                                const placeholder = document.createElement('div');
+                                placeholder.className = 'handicap-placeholder';
+                                th.appendChild(placeholder);
+                        }
+                        else
+                        {
+                                const hdcpBtn = document.createElement('div');
+                                hdcpBtn.className = 'handicap-btn';
+                                hdcpBtn.innerText = '讓 4';
+                                hdcpBtn.id = `table${tableId}-hdcp-p${i+1}`; 
+                                hdcpBtn.onclick = function() { handleHdcpClick(this); };
+                                th.appendChild(hdcpBtn);
+                        }
+
+                        const statsDiv = document.createElement('div');
+                        statsDiv.className = 'stats-container';
+                        
+                        // 僅 P1-P4 顯示 BA 統計
+                        if (i < 4) 
+                        {
+                                const statBa = document.createElement('div');
+                                statBa.className = 'stats-btn stats-ba';
+                                statBa.innerText = '0';
+                                statBa.id = `table${tableId}-total-ba-p${i+1}`; 
+                                statsDiv.appendChild(statBa);
+                        }
+                        
+                        const statBb = document.createElement('div');
+                        statBb.className = 'stats-btn stats-bb';
+                        statBb.innerText = '0';
+                        statBb.id = `table${tableId}-total-bb-p${i+1}`;
+                        statsDiv.appendChild(statBb);
+
+                        th.appendChild(statsDiv);
+
+                        headerRow.appendChild(th);
+                }
+
+                for (let i = 0; i < 9; i++)
+                {
+                        const tr = document.createElement('tr');
+                        let displayHole = startHole + i;
+                        let par = zoneData.par[i];
+                        let hdcp = zoneData.hdcp[i];
+
+                        tr.innerHTML = `<td class="hole-col">${displayHole}</td><td class="par-col">${par}</td><td class="hdcp-col">${hdcp}</td>`;
+
+                        for (let p = 0; p < playerNames.length; p++)
+                        {
+                                const td = document.createElement('td');
+
+                                const scoreBtn = document.createElement('button');
+                                scoreBtn.className = 'score-btn';
+                                scoreBtn.innerText = "";
+                                scoreBtn.id = `table${tableId}-row${i}-p${p+1}-score`;
+                                scoreBtn.onclick = function() { handleScoreClick(this, par); };
+                                td.appendChild(scoreBtn);
+
+                                const subContainer = document.createElement('div');
+                                subContainer.className = 'sub-btn-container';
+
+                                // 僅 P1-P4 顯示 BA 按鈕
+                                if (p < 4)
+                                {
+                                        const baBtn = document.createElement('button');
+                                        baBtn.className = 'btn-ba';
+                                        baBtn.innerText = "";
+                                        baBtn.id = `table${tableId}-row${i}-p${p+1}-ba`;
+                                        baBtn.onclick = function() { handleBAClick(tableId, i, p); };
+                                        subContainer.appendChild(baBtn);
+                                }
+
+                                if (p > 0)
+                                {
+                                        const bbBtn = document.createElement('button');
+                                        bbBtn.className = 'btn-bb';
+                                        bbBtn.innerText = "";
+                                        bbBtn.id = `table${tableId}-row${i}-p${p+1}-bb`;
+                                        subContainer.appendChild(bbBtn);
+                                }
+
+                                td.appendChild(subContainer);
+                                tr.appendChild(td);
+                        }
+                        body.appendChild(tr);
+                }
+        }
+
+        function saveData()
+        {
+                const settings = 
+                {
+                        course: currentCourseName,
+                        zone1: currentZone1,
+                        zone2: currentZone2
+                };
+                const values = {};
+                const elements = document.querySelectorAll('[id]');
+                elements.forEach(el => 
+                {
+                        if (el.id === 'course-selector' || el.id.startsWith('zone-btn') || el.id.startsWith('header') || el.id.startsWith('body')) return;
+                        values[el.id] = el.innerText;
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, values }));
+        }
+
+        function loadInputValues()
+        {
+                const json = localStorage.getItem(STORAGE_KEY);
+                if (!json) return;
+                const data = JSON.parse(json);
+                
+                if (data.values)
+                {
+                        for (const [id, val] of Object.entries(data.values))
+                        {
+                                const el = document.getElementById(id);
+                                if (el)
+                                {
+                                        el.innerText = val;
+                                        if (id.includes('-score'))
+                                        {
+                                                const tr = el.closest('tr');
+                                                if (tr)
+                                                {
+                                                        const parCell = tr.children[1]; 
+                                                        if (parCell)
+                                                        {
+                                                                const par = parseInt(parCell.innerText);
+                                                                const score = parseInt(val);
+                                                                if (!isNaN(score) && !isNaN(par))
+                                                                {
+                                                                        updateScoreVisual(el, score, par);
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                        
+                        for (let t = 1; t <= 2; t++)
+                        {
+                                for (let r = 0; r < 9; r++)
+                                {
+                                        updateRowBackground(t, r);
+                                }
+                        }
+                        
+                        updateAllBBCalculations();
+                        updateTotals();
+                }
+        }
+
+        function loadData()
+        {
+                const json = localStorage.getItem(STORAGE_KEY);
+                if (json)
+                {
+                        try 
+                        {
+                                const data = JSON.parse(json);
+                                if (data.settings && COURSE_DATA[data.settings.course])
+                                {
+                                        currentCourseName = data.settings.course;
+                                        currentZone1 = data.settings.zone1;
+                                        currentZone2 = data.settings.zone2;
+                                }
+                        }
+                        catch (e) {}
+                }
+                renderAll();
+        }
+
+        function resetAllData()
+        {
+                if (confirm("警告：這將完全清除所有儲存的分數與設定，回到初始狀態。\n確定要繼續嗎？"))
+                {
+                        localStorage.removeItem(STORAGE_KEY);
+                        currentCourseName = "台中國際";
+                        currentZone1 = "東區";
+                        currentZone2 = "西區";
+                        renderAll();
+                        
+                        document.querySelectorAll('.btn-ba').forEach(b => 
+                        {
+                                b.innerText = "";
+                                b.classList.remove('active-bg');
+                                b.style.backgroundColor = "#fff";
+                        });
+                        document.querySelectorAll('.btn-bb').forEach(b => 
+                        {
+                                b.innerText = "";
+                                b.classList.remove('win', 'lose');
+                        });
+                        document.querySelectorAll('.score-btn').forEach(b => 
+                        {
+                                b.innerText = "";
+                                b.classList.remove('style-par', 'style-bogey', 'style-double-bogey', 'style-birdie', 'style-eagle');
+                        });
+                        
+                        updateTotals();
+                }
+        }
+
+        loadData();
+
+        </script>
 </body>
 </html>
