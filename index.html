@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>高爾夫分數紀錄卡 - 讓桿提示版</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>高爾夫分數紀錄卡 - PAR橘色版</title>
         <style>
                 body 
                 {
@@ -12,6 +12,8 @@
                         padding: 20px;
                         padding-bottom: 100px;
                         user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                        touch-action: manipulation;
                 }
 
                 .main-controls 
@@ -134,14 +136,20 @@
                 
                 th 
                 {
-                        background-color: #ecf0f1;
+                        background-color: #7f8c8d; 
                         font-weight: bold;
-                        color: #333;
+                        color: white; 
                 }
 
                 .hole-col { width: 40px; background: #e8f5e9; font-weight: bold; vertical-align: middle;}
                 .par-col { width: 40px; vertical-align: middle;}
                 .hdcp-col { width: 40px; vertical-align: middle;}
+
+                /* Active Row: 淡黃色背景 */
+                tr.active-row td, tr.active-row .hole-col
+                {
+                        background-color: #fff9c4 !important;
+                }
 
                 .player-header {
                         min-width: 90px; 
@@ -153,7 +161,7 @@
                         border: 1px solid transparent;
                         font-size: 1.1em;
                         font-weight: bold;
-                        color: #2c3e50;
+                        color: white; 
                         cursor: pointer;
                         padding: 5px;
                         width: 100%;
@@ -164,8 +172,8 @@
                 }
                 .player-name-btn:hover 
                 {
-                        background-color: #dfe6e9;
-                        border-color: #b2bec3;
+                        background-color: rgba(255,255,255,0.2);
+                        border-color: rgba(255,255,255,0.5);
                 }
 
                 .handicap-btn 
@@ -198,7 +206,7 @@
                         gap: 2px;
                         margin-top: 5px;
                         padding-top: 5px;
-                        border-top: 1px dashed #bdc3c7;
+                        border-top: 1px dashed rgba(255,255,255,0.3); 
                 }
                 
                 .stats-btn 
@@ -214,6 +222,7 @@
                         align-items: center;
                         justify-content: center;
                         cursor: default;
+                        color: #333; 
                 }
 
                 .stats-ba { color: #e74c3c; border-color: #e74c3c; }
@@ -237,7 +246,14 @@
                 }
                 .score-btn:active { transform: scale(0.95); }
 
-                .score-btn.style-par { border: 1px solid #7f8c8d; color: #2c3e50; background-color: #fff; }
+                /* === 修改重點：PAR 樣式改為橘色背景 === */
+                .score-btn.style-par 
+                { 
+                        border: 1px solid #ef6c00; 
+                        color: #000; /* 黑字清楚 */
+                        background-color: #ffcc80; /* 橘色背景 */
+                }
+                
                 .score-btn.style-bogey { border: 2px solid #000; color: #000; background-color: #fff; border-radius: 0; }
                 .score-btn.style-double-bogey { border: 2px solid #000; color: #000; background-color: #fff; border-radius: 0; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
                 .score-btn.style-birdie { border: 2px solid red; color: red; background-color: #fff; border-radius: 50%; }
@@ -281,14 +297,12 @@
                 .btn-bb.win { color: blue; }
                 .btn-bb.lose { color: red; }
                 
-                /* 新增：符合讓桿條件時的背景色 (淡紅色) */
                 .btn-bb.handicap-applied 
                 {
                         background-color: #ffe0e0 !important; 
                         border-color: #ffcccc !important;
                 }
 
-                /* === 自定義 Modal 樣式 === */
                 .modal-overlay 
                 {
                         position: fixed;
@@ -408,7 +422,7 @@
                 "張志強", "王曉梅", "陳冠宇", "林怡岑"
         ];
         
-        const STORAGE_KEY = 'golf_scorecard_v18_hdcp_color';
+        const STORAGE_KEY = 'golf_scorecard_v21_par_orange';
         
         let lastBaClickTime = 0;
         let pendingZoneChange = null;
@@ -552,6 +566,8 @@
                         }
                 }
                 updateTotals();
+                // 清除後，因為沒資料，背景肯定要恢復
+                setActiveRow(tableId, -1); 
         }
 
         function updateZoneLabels()
@@ -608,7 +624,7 @@
                 }
 
                 let p1Total = 0;
-                for (let i = 1; i < 4; i++) // 只計算同組的 P2-P4
+                for (let i = 1; i < 4; i++) // 只計算 P2-P4
                 {
                         p1Total -= bbSums[i];
                 }
@@ -667,13 +683,11 @@
 
                                 if (isNaN(p1ScoreVal))
                                 {
-                                        // P1 分數未填時，仍需判斷讓桿並顯示底色
                                         for (let p = 2; p <= playerNames.length; p++)
                                         {
                                                 const hdcpBtn = document.getElementById(`table${tableId}-hdcp-p${p}`);
                                                 let hdcpSetting = parseInt(hdcpBtn.innerText.replace('讓 ', ''));
                                                 let isHdcp = (holeHdcp <= hdcpSetting);
-                                                
                                                 updateBBDisplay(tableId, r, p, "", isHdcp);
                                         }
                                         continue;
@@ -746,6 +760,27 @@
         }
 
         // ==========================================
+        //  列活動狀態 (Focus Highlighter)
+        // ==========================================
+        
+        function setActiveRow(targetTableId, targetRowIndex)
+        {
+                // 1. 清除所有已存在的 active-row
+                document.querySelectorAll('tr.active-row').forEach(tr => tr.classList.remove('active-row'));
+                
+                // 2. 如果傳入有效索引，則設定新的 active-row
+                if (targetTableId !== -1 && targetRowIndex !== -1)
+                {
+                        const anchor = document.getElementById(`table${targetTableId}-row${targetRowIndex}-p1-score`);
+                        if (anchor)
+                        {
+                                const tr = anchor.closest('tr');
+                                if (tr) tr.classList.add('active-row');
+                        }
+                }
+        }
+
+        // ==========================================
         //  介面操作
         // ==========================================
 
@@ -811,6 +846,13 @@
                 btn.innerText = nextVal;
                 updateScoreVisual(btn, nextVal, par);
                 updateAllBBCalculations();
+                
+                // 設定該列為 Active (其他列會恢復)
+                let parts = btn.id.split('-'); 
+                let tId = parseInt(parts[0].replace('table',''));
+                let rIdx = parseInt(parts[1].replace('row',''));
+                setActiveRow(tId, rIdx);
+
                 saveData();
         }
 
@@ -868,6 +910,10 @@
                 
                 updateRowBackground(tableId, rowIndex);
                 updateTotals();
+                
+                // 設定該列為 Active
+                setActiveRow(tableId, rowIndex);
+                
                 saveData();
         }
 
@@ -940,21 +986,38 @@
                 }
 
                 let currentName = btn.innerText;
-                let idx = playerNames.indexOf(currentName);
                 
-                if (idx === -1)
+                // --- 智慧選人邏輯 (修正版 2: 完整循環) ---
+                const allNameBtns = document.querySelectorAll('.player-name-btn');
+                const usedNames = new Set();
+                allNameBtns.forEach(b => 
                 {
-                        btn.innerText = playerNames[0];
-                }
-                else if (idx === playerNames.length - 1)
+                        if (b.id !== btn.id && b.innerText !== "") 
+                        {
+                                usedNames.add(b.innerText);
+                        }
+                });
+
+                let availableCandidates = [];
+                for(let name of playerNames)
                 {
-                        btn.innerText = "";
+                        if(!usedNames.has(name))
+                        {
+                                availableCandidates.push(name);
+                        }
                 }
-                else
+                availableCandidates.push("");
+
+                let currIdx = availableCandidates.indexOf(currentName);
+                if (currIdx === -1)
                 {
-                        btn.innerText = playerNames[idx + 1];
+                        currIdx = -1;
                 }
+
+                let nextIdx = (currIdx + 1) % availableCandidates.length;
+                let nextName = availableCandidates[nextIdx];
                 
+                btn.innerText = nextName;
                 saveData();
         }
 
@@ -1016,7 +1079,6 @@
                         const statsDiv = document.createElement('div');
                         statsDiv.className = 'stats-container';
                         
-                        // 僅 P1-P4 顯示 BA 統計
                         if (i < 4) 
                         {
                                 const statBa = document.createElement('div');
@@ -1060,7 +1122,6 @@
                                 const subContainer = document.createElement('div');
                                 subContainer.className = 'sub-btn-container';
 
-                                // 僅 P1-P4 顯示 BA 按鈕
                                 if (p < 4)
                                 {
                                         const baBtn = document.createElement('button');
@@ -1149,6 +1210,7 @@
                         
                         updateAllBBCalculations();
                         updateTotals();
+                        setActiveRow(-1, -1);
                 }
         }
 
@@ -1182,6 +1244,23 @@
                         currentZone2 = "西區";
                         renderAll();
                         
+                        for (let i = 0; i < playerNames.length; i++)
+                        {
+                                let t1NameBtn = document.getElementById(`table1-p${i+1}-name`);
+                                let t2NameBtn = document.getElementById(`table2-p${i+1}-name`);
+                                
+                                if (i === 0)
+                                {
+                                        if(t1NameBtn) t1NameBtn.innerText = playerNames[0];
+                                        if(t2NameBtn) t2NameBtn.innerText = playerNames[0];
+                                }
+                                else
+                                {
+                                        if(t1NameBtn) t1NameBtn.innerText = "";
+                                        if(t2NameBtn) t2NameBtn.innerText = "";
+                                }
+                        }
+
                         document.querySelectorAll('.btn-ba').forEach(b => 
                         {
                                 b.innerText = "";
@@ -1200,6 +1279,9 @@
                         });
                         
                         updateTotals();
+                        setActiveRow(-1, -1);
+                        
+                        saveData();
                 }
         }
 
