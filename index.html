@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - 名單同步版</title>
+    <title>高爾夫分數紀錄卡 - 自定義洞名版(v28)</title>
     <style>
         body 
         {
@@ -123,7 +123,7 @@
         th, td 
         {
             border: 1px solid #ddd;
-            padding: 6px 4px;
+            padding: 4px 2px;
             vertical-align: middle; 
             white-space: nowrap; 
             background-color: #fff;
@@ -160,7 +160,7 @@
             height: 100%;
         }
         .hole-val {
-            font-size: 1.4em;
+            font-size: 1.2em; /* 稍微縮小一點以容納中文 */
             font-weight: 900;
             line-height: 1.2;
         }
@@ -190,20 +190,19 @@
              color: #000 !important;
         }
 
-        /* 修正顏色衝突 */
         tr.active-row .bg-par-3 { background-color: #ffccbc !important; } 
         tr.active-row .bg-par-4 { background-color: #fff9c4 !important; } 
         tr.active-row .bg-par-5 { background-color: #b2ebf2 !important; } 
 
         .player-header {
-            min-width: 90px; 
+            min-width: 75px;
         }
 
         .player-name-btn 
         {
             background: none;
             border: 1px solid transparent;
-            font-size: 1.1em;
+            font-size: 1.0em;
             font-weight: bold;
             color: white; 
             cursor: pointer;
@@ -219,7 +218,6 @@
             background-color: rgba(255,255,255,0.2);
             border-color: rgba(255,255,255,0.5);
         }
-        /* 後9名單鎖定樣式 */
         .player-name-btn.locked 
         {
             pointer-events: none;
@@ -233,7 +231,7 @@
             border: 1px solid #b3d7ff;
             color: #0056b3;
             font-size: 0.9em;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
             cursor: pointer;
             height: 24px;
@@ -248,7 +246,7 @@
             border: 1px solid #ffe0b2;
             color: #ef6c00;
             font-size: 0.9em;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
             height: 24px;
             line-height: 20px;
@@ -268,9 +266,9 @@
         
         .stats-btn 
         {
-            width: 35px; 
-            height: 28px;
-            font-size: 14px; 
+            width: 30px;
+            height: 26px;
+            font-size: 13px;
             font-weight: bold;
             border-radius: 4px;
             border: 1px solid #bdc3c7;
@@ -289,13 +287,13 @@
 
         .score-btn 
         {
-            width: 50px;
-            height: 45px;
-            font-size: 20px;
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             transition: all 0.1s;
             background-color: #fff;
             border: 1px dashed #ccc;
@@ -323,33 +321,33 @@
             display: flex;
             justify-content: center;
             gap: 2px;
-            height: 30px;
+            height: 28px;
         }
 
         .btn-ba 
         {
-            width: 25px; 
-            height: 30px;
+            width: 21px;
+            height: 28px;
             background-color: #fff;
             border: 1px solid #999;
             border-radius: 4px;
             font-weight: bold;
             color: #e74c3c;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             padding: 0;
         }
         .btn-ba.active-bg { background-color: #dcedc8; border-color: #8bc34a; }
 
         .btn-bb 
         {
-            width: 25px;
-            height: 30px;
+            width: 21px;
+            height: 28px;
             background-color: #f9f9f9; 
             border: 1px solid #ccc;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             padding: 0;
             pointer-events: none; 
         }
@@ -476,33 +474,54 @@
     // ==========================================
 
     const playerNames = [
-        "陳志明", "林雅婷", "張家豪", "王淑芬", 
-        "李建國", "黃怡君", "吳冠宇", "劉欣怡",
-        "張志強", "王曉梅", "陳冠宇", "林怡岑"
+        "張簡榮力", "洪忠宜", "陳振峯", "趙振明", 
+        "李子瑋", "張嘉原", "巫吉生", "吳建輝",
+        "林政翰", "陳威宇", "范秀蘭", "Jovie"
     ];
     
-    const STORAGE_KEY = 'golf_scorecard_v26_sync_names';
+    const STORAGE_KEY = 'golf_scorecard_v28_custom_holes';
     
     let lastBaClickTime = 0;
     let pendingZoneChange = null;
 
+    // === 修改重點：加入 holes 定義 ===
     const COURSE_DATA = 
     {
         "台中國際": 
         {
             zones: 
             {
-                "東區": { par: [4,4,3,5,4,4,3,5,4], hdcp: [2,8,5,4,7,1,9,3,6] },
-                "中區": { par: [4,4,3,5,4,4,3,4,5], hdcp: [7,2,8,5,4,1,9,3,6] },
-                "西區": { par: [5,4,3,4,4,3,4,5,4], hdcp: [3,6,9,8,1,4,7,2,5] }
+                "東區": { 
+                    holes: ["東1", "東2", "東3", "東4", "東5", "東6", "東7", "東8", "東9"],
+                    par: [4,4,3,5,4,4,3,5,4], 
+                    hdcp: [2,8,5,4,7,1,9,3,6] 
+                },
+                "中區": { 
+                    holes: ["中1", "中2", "中3", "中4", "中5", "中6", "中7", "中8", "中9"],
+                    par: [4,4,3,5,4,4,3,4,5], 
+                    hdcp: [7,2,8,5,4,1,9,3,6] 
+                },
+                "西區": { 
+                    holes: ["西1", "西2", "西3", "西4", "西5", "西6", "西7", "西8", "西9"],
+                    par: [5,4,3,4,4,3,4,5,4], 
+                    hdcp: [3,6,9,8,1,4,7,2,5] 
+                }
             }
         },
         "豐原球場": 
         {
             zones: 
             {
-                "OUT": { par: [4,5,5,3,4,4,3,4,3], hdcp: [5,3,7,15,1,9,17,11,13] },
-                "IN": { par: [5,3,4,3,4,3,5,4,5], hdcp: [4,18,2,16,10,14,12,6,8] }
+                "OUT": { 
+                    holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                    par: [4,5,5,3,4,4,3,4,3], 
+                    hdcp: [5,3,7,15,1,9,17,11,13] 
+                },
+                "IN": { 
+                    holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"],
+                    par: [5,3,4,3,4,3,5,4,5], 
+                    hdcp: [4,18,2,16,10,14,12,6,8] 
+                }
             }
         }
     };
@@ -840,7 +859,6 @@
 
         // 3. 亮顯整欄 (Column)
         // pIdx 是 1-based (p1, p2...)
-        // 表格結構：Hole(0), P1(1), P2(2)... (因為第一欄是 Hole/Par/Hdcp 合併)
         
         if (pIdx >= 1) {
             const domColIdx = pIdx; // 因為第一欄index=0, P1 index=1, 與 pIdx 一致
@@ -1102,13 +1120,11 @@
 
     function handleNameClick(btn)
     {
-        // === 名稱點擊：強制雙向同步，且只允許在前9修改 ===
         let parts = btn.id.split('-');
         let tId = parseInt(parts[0].replace('table',''));
         let pIdx = parseInt(parts[1].replace('p',''));
 
-        // 後9按鈕已鎖定，這段其實是防禦性編碼
-        if (tId === 2) return; 
+        if (tId === 2) return; // 鎖定後9
 
         let currentName = btn.innerText;
         const fullCycleList = [...playerNames, ""];
@@ -1120,7 +1136,7 @@
         let nextIdx = (currIdx + 1) % fullCycleList.length;
         let nextName = fullCycleList[nextIdx];
         
-        // 同步更新前9與後9
+        // 同步
         let t1Btn = document.getElementById(`table1-p${pIdx}-name`);
         let t2Btn = document.getElementById(`table2-p${pIdx}-name`);
         
@@ -1153,8 +1169,8 @@
         body.innerHTML = '';
 
         const zoneData = COURSE_DATA[currentCourseName].zones[zoneName];
-        let startHole = (currentCourseName === "豐原球場" && zoneName === "IN") ? 10 : 1;
-
+        // === 修改重點：直接從 zoneData 取 holes，不需要 startHole 計算 ===
+        
         headerRow.innerHTML = `<th class="col-combined-header">Hole<br><span style="font-size:0.6em; opacity:0.8;">HDCP</span></th>`;
         
         for (let i = 0; i < playerNames.length; i++)
@@ -1165,7 +1181,6 @@
             const nameBtn = document.createElement('button');
             nameBtn.className = 'player-name-btn';
             
-            // === 後 9 名稱鎖定 (Lock Table 2 names) ===
             if (tableId === 2) {
                 nameBtn.classList.add('locked');
             }
@@ -1218,7 +1233,9 @@
         for (let i = 0; i < 9; i++)
         {
             const tr = document.createElement('tr');
-            let displayHole = startHole + i;
+            
+            // === 修改重點：使用 zoneData.holes[i] ===
+            let displayHole = zoneData.holes ? zoneData.holes[i] : (i+1);
             let par = zoneData.par[i];
             let hdcp = zoneData.hdcp[i];
 
