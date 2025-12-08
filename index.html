@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - 穩定版(v34)</title>
+    <title>高爾夫分數紀錄卡 - 旗桿修復版(v36)</title>
     <style>
         body 
         {
@@ -161,11 +161,11 @@
         
         /* HDCP 字體放大加深 */
         .hdcp-val {
-            font-size: 1.2em; 
+            font-size: 1.1em; /* 稍微調整大小以容納圖示 */
             color: #000; 
             font-weight: 900; 
-            margin-top: 2px;
-            opacity: 0.7;
+            margin-top: 4px;
+            opacity: 0.8;
         }
         .bg-par-3 .hdcp-val { color: #b71c1c; opacity: 1; }
         .bg-par-5 .hdcp-val { color: #01579b; opacity: 1; }
@@ -461,51 +461,70 @@
     //  設定與資料
     // ==========================================
 
-    const STORAGE_KEY = 'golf_scorecard_v34_stable'; // Change Key to clear corrupt data
+    const STORAGE_KEY = 'golf_scorecard_v36_flag_fixed'; // Change Key to ensure clean start
     
-    // Hardcoded List as requested
+    // Updated List (13 players)
     const playerNames = [
-        "張簡榮力", "洪忠宜", "陳振峯", "趙振明", 
-        "李子瑋", "張嘉原", "巫吉生", "吳建輝",
-        "林政翰", "陳威宇", "范秀蘭", "Jovie"
+        "張簡榮力", 
+        "洪忠宜", 
+        "陳振峯", 
+        "趙振明", 
+        "李子瑋", 
+        "張嘉原", 
+        "巫吉生", 
+        "吳建輝",
+        "林政翰", 
+        "陳威宇", 
+        "范秀蘭", 
+        "謝旼達",
+        "高台玉"
     ];
 
-    const COURSE_DATA = 
-    {
-        "台中國際": 
-        {
-            zones: 
-            {
-                "東區": { 
+    const COURSE_DATA = {
+        "台中國際": {
+            zones: {
+                "東區": {
                     holes: ["東1", "東2", "東3", "東4", "東5", "東6", "東7", "東8", "東9"],
-                    par: [4,4,3,5,4,4,3,5,4], 
-                    hdcp: [2,8,5,4,7,1,9,3,6] 
+                    par: [4, 4, 3, 5, 4, 4, 3, 5, 4],
+                    hdcp: [2, 8, 5, 4, 7, 1, 9, 3, 6]
                 },
-                "中區": { 
+                "中區": {
                     holes: ["中1", "中2", "中3", "中4", "中5", "中6", "中7", "中8", "中9"],
-                    par: [4,4,3,5,4,4,3,4,5], 
-                    hdcp: [7,2,8,5,4,1,9,3,6] 
+                    par: [4, 4, 3, 5, 4, 4, 3, 4, 5],
+                    hdcp: [7, 2, 8, 5, 4, 1, 9, 3, 6]
                 },
-                "西區": { 
+                "西區": {
                     holes: ["西1", "西2", "西3", "西4", "西5", "西6", "西7", "西8", "西9"],
-                    par: [5,4,3,4,4,3,4,5,4], 
-                    hdcp: [3,6,9,8,1,4,7,2,5] 
+                    par: [5, 4, 3, 4, 4, 3, 4, 5, 4],
+                    hdcp: [3, 6, 9, 8, 1, 4, 7, 2, 5]
                 }
             }
         },
-        "豐原球場": 
-        {
-            zones: 
-            {
-                "OUT": { 
+        "豐原球場": {
+            zones: {
+                "OUT": {
                     holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-                    par: [4,5,5,3,4,4,3,4,3], 
-                    hdcp: [5,3,7,15,1,9,17,11,13] 
+                    par: [4, 5, 5, 3, 4, 4, 3, 4, 3],
+                    hdcp: [5, 3, 7, 15, 1, 9, 17, 11, 13]
                 },
-                "IN": { 
+                "IN": {
                     holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"],
-                    par: [5,3,4,3,4,3,5,4,5], 
-                    hdcp: [4,18,2,16,10,14,12,6,8] 
+                    par: [5, 3, 4, 3, 4, 3, 5, 4, 5],
+                    hdcp: [4, 18, 2, 16, 10, 14, 12, 6, 8]
+                }
+            }
+        },
+        "彰化球場": {
+            zones: {
+                "OUT": {
+                    holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                    par: [5, 3, 4, 4, 4, 5, 4, 4, 3],
+                    hdcp: [3, 17, 1, 11, 7, 13, 9, 5, 15]
+                },
+                "IN": {
+                    holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"],
+                    par: [5, 3, 4, 4, 4, 4, 3, 5, 5],
+                    hdcp: [4, 16, 2, 18, 6, 8, 14, 10, 12]
                 }
             }
         }
@@ -1135,6 +1154,7 @@
 
         const zoneData = COURSE_DATA[currentCourseName].zones[zoneName];
         
+        // 使用 HTML entity &#9971; 代表旗桿
         headerRow.innerHTML = `<th class="col-combined-header">Hole<br><span style="font-size:0.6em; opacity:0.8;">HDCP</span></th>`;
         
         for (let i = 0; i < playerNames.length; i++)
@@ -1210,7 +1230,7 @@
                 <td class="col-combined-cell ${bgClass}">
                     <div class="cell-content">
                         <div class="hole-val">${displayHole}</div>
-                        <div class="hdcp-val">${hdcp}</div>
+                        <div class="hdcp-val">&#9971; ${hdcp}</div>
                     </div>
                 </td>`;
 
@@ -1275,16 +1295,7 @@
             if (el.id === 'edit-player-list' || el.id === 'edit-course-data') return;
             values[el.id] = el.innerText;
         });
-        
-        const storageData = {
-            settings,
-            values,
-            custom_config: {
-                playerNames,
-                COURSE_DATA
-            }
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, values }));
     }
 
     function loadInputValues()
@@ -1346,17 +1357,6 @@
             try 
             {
                 const data = JSON.parse(json);
-                if (data.custom_config) {
-                    if (Array.isArray(data.custom_config.playerNames) && data.custom_config.playerNames.length > 0) {
-                        playerNames = data.custom_config.playerNames;
-                    } else {
-                        console.warn("Corrupted player list detected. Resetting to default.");
-                        playerNames = [...DEFAULT_PLAYER_NAMES];
-                    }
-                    
-                    if (data.custom_config.COURSE_DATA) COURSE_DATA = data.custom_config.COURSE_DATA;
-                }
-
                 if (data.settings && COURSE_DATA[data.settings.course])
                 {
                     currentCourseName = data.settings.course;
@@ -1364,12 +1364,7 @@
                     currentZone2 = data.settings.zone2;
                 }
             }
-            catch (e) {
-                console.error("Critical Load Error:", e);
-                localStorage.removeItem(STORAGE_KEY);
-                playerNames = [...DEFAULT_PLAYER_NAMES];
-                COURSE_DATA = JSON.parse(JSON.stringify(DEFAULT_COURSE_DATA));
-            }
+            catch (e) {}
         }
         renderAll();
     }
