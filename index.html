@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - 十字定位版</title>
+    <title>高爾夫分數紀錄卡 - 名單同步版</title>
     <style>
         body 
         {
@@ -44,35 +44,32 @@
             color: #333;
         }
 
-        .action-btn 
-        {
-            background-color: #2c3e50;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .action-btn:hover 
-        {
-            background-color: #34495e;
-        }
-
         .zone-select-btn
         {
             background-color: #27ae60;
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 30px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 1.5em; 
         }
         .zone-select-btn:hover
         {
             background-color: #2ecc71;
+        }
+
+        .action-btn 
+        {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 1.2em; 
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
         .btn-reset 
@@ -87,10 +84,7 @@
             font-weight: bold;
             margin-left: auto;
         }
-        .btn-reset:hover 
-        {
-            background-color: #c0392b;
-        }
+        .btn-reset:hover { background-color: #c0392b; }
 
         .card-container 
         {
@@ -102,126 +96,104 @@
             overflow: hidden;
             margin-bottom: 20px;
             overflow-x: auto; 
-            position: relative;
-            /* 讓表頭 Sticky 生效的關鍵 */
-            max-height: 85vh; 
-            overflow-y: auto;
         }
 
         .zone-header 
         {
             background-color: #27ae60;
             color: white;
-            padding: 10px 15px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.1em;
+            font-size: 1.6em; 
             font-weight: bold;
             min-width: max-content;
-            position: sticky; 
-            left: 0;
-            top: 0;
-            z-index: 200; /* 最高層級 */
         }
 
         table 
         {
             width: 100%;
-            border-collapse: separate; 
-            border-spacing: 0;
+            border-collapse: collapse;
             text-align: center;
             table-layout: auto; 
-            min-width: 1200px; 
+            min-width: 1000px; 
         }
         
         th, td 
         {
             border: 1px solid #ddd;
             padding: 6px 4px;
-            vertical-align: top;
+            vertical-align: middle; 
             white-space: nowrap; 
             background-color: #fff;
         }
         
-        /* === 表頭 Sticky Top 設定 (解決人名看不見的問題) === */
         thead th 
         {
-            position: sticky;
-            top: 0;
-            z-index: 100;
             background-color: #7f8c8d; 
             color: white; 
-            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
         }
 
-        /* === 凍結欄位設定 (Sticky Columns) === */
-        .sticky-col {
-            position: sticky;
-            z-index: 20; 
+        /* 三欄合一樣式 */
+        .col-combined-header {
+            width: 60px;
+            background-color: #546e7a !important;
+            color: white;
         }
         
-        /* 表頭左上角的交叉點 (既 Sticky Top 又 Sticky Left)，層級要比普通 Sticky 高 */
-        thead th.sticky-col {
-            z-index: 150; 
+        .col-combined-cell {
+            border-right: 2px solid #ccc;
+            padding: 4px !important;
         }
 
-        /* 為了防止邊框消失，這裡做一點微調 */
-        .sticky-col::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 1px;
-            background: #ddd;
+        /* 顏色定義 */
+        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; } 
+        .bg-par-4 { background-color: #ffffff !important; color: #333; }    
+        .bg-par-5 { background-color: #b3e5fc !important; color: #01579b; } 
+
+        .cell-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
         }
-
-        /* 第一欄 Hole */
-        .col-hole { left: 0; width: 40px; }
-        /* 第二欄 Par */
-        .col-par { left: 40px; width: 40px; }
-        /* 第三欄 Hdcp */
-        .col-hdcp { left: 80px; width: 40px; }
-
-        .hole-col { background: #e8f5e9 !important; font-weight: bold; vertical-align: middle; color: #333;}
-        .par-col { background-color: #f0f0f0 !important; vertical-align: middle; color: #333;}
-        .hdcp-col { background-color: #fff !important; vertical-align: middle; color: #555;}
-        
-        /* 表頭背景色覆蓋 */
-        th.hole-col, th.par-col, th.hdcp-col {
-            background-color: #546e7a !important; 
-            color: white !important;
+        .hole-val {
+            font-size: 1.4em;
+            font-weight: 900;
+            line-height: 1.2;
         }
+        .hdcp-val {
+            font-size: 0.75em;
+            color: rgba(0,0,0,0.5);
+            font-weight: normal;
+        }
+        .bg-par-3 .hdcp-val { color: rgba(183, 28, 28, 0.7); }
+        .bg-par-5 .hdcp-val { color: rgba(1, 87, 155, 0.7); }
 
 
-        /* === 十字亮顯樣式 (Crosshair) === */
-        
-        /* 列亮顯 (蛋黃色) */
+        /* === 十字定位 (Crosshair) 樣式 === */
         tr.active-row td
         {
             background-color: #fff9c4 !important;
         }
-        
-        /* 欄亮顯 (蛋黃色) */
         td.active-col, th.active-col
         {
             background-color: #fff9c4 !important;
         }
-        /* 若是表頭被選中，字體顏色改深一點以便閱讀 */
         th.active-col .player-name-btn {
             color: #000 !important;
-            text-shadow: none;
         }
         th.active-col {
-             background-color: #fff59d !important; /* 表頭稍微深一點的黃 */
+             background-color: #fff59d !important; 
              color: #000 !important;
         }
 
-        /* 修正 Sticky 欄位在 Active Row 的背景色 */
-        tr.active-row .hole-col { background-color: #dcedc8 !important; }
-        tr.active-row .par-col { background-color: #f0f4c3 !important; }
-        tr.active-row .hdcp-col { background-color: #fff9c4 !important; }
+        /* 修正顏色衝突 */
+        tr.active-row .bg-par-3 { background-color: #ffccbc !important; } 
+        tr.active-row .bg-par-4 { background-color: #fff9c4 !important; } 
+        tr.active-row .bg-par-5 { background-color: #b2ebf2 !important; } 
 
         .player-header {
             min-width: 90px; 
@@ -247,6 +219,12 @@
             background-color: rgba(255,255,255,0.2);
             border-color: rgba(255,255,255,0.5);
         }
+        /* 後9名單鎖定樣式 */
+        .player-name-btn.locked 
+        {
+            pointer-events: none;
+            opacity: 0.9;
+        }
 
         .handicap-btn 
         {
@@ -263,12 +241,19 @@
             box-sizing: border-box;
         }
 
-        .handicap-placeholder 
+        .host-btn 
         {
             display: inline-block;
+            background-color: #fff3e0;
+            border: 1px solid #ffe0b2;
+            color: #ef6c00;
+            font-size: 0.9em;
+            padding: 2px 8px;
+            border-radius: 10px;
             height: 24px;
-            width: 100%;
-            visibility: hidden;
+            line-height: 20px;
+            box-sizing: border-box;
+            cursor: default;
         }
 
         .stats-container 
@@ -441,12 +426,12 @@
         </div>
 
         <div class="control-group">
-            <span class="label-text">前 9 球道 : </span>
+            <span class="label-text" style="font-size:1.2em;">前 9 : </span>
             <button id="zone-select-btn-1" class="zone-select-btn" onclick="tryToggleZone(1)">--</button>
         </div>
 
         <div class="control-group">
-            <span class="label-text">後 9 球道 : </span>
+            <span class="label-text" style="font-size:1.2em;">後 9 : </span>
             <button id="zone-select-btn-2" class="zone-select-btn" onclick="tryToggleZone(2)">--</button>
         </div>
 
@@ -454,7 +439,7 @@
     </div>
 
     <div class="card-container">
-        <div class="zone-header" style="position: sticky; top: 0; z-index: 200;">
+        <div class="zone-header">
             <span id="zone-label-1">球道選擇 (前 9)</span>
         </div>
         <table>
@@ -464,7 +449,7 @@
     </div>
 
     <div class="card-container">
-        <div class="zone-header" style="position: sticky; top: 0; z-index: 200;">
+        <div class="zone-header">
             <span id="zone-label-2">球道選擇 (後 9)</span>
         </div>
         <table>
@@ -496,7 +481,7 @@
         "張志強", "王曉梅", "陳冠宇", "林怡岑"
     ];
     
-    const STORAGE_KEY = 'golf_scorecard_v22_crosshair';
+    const STORAGE_KEY = 'golf_scorecard_v26_sync_names';
     
     let lastBaClickTime = 0;
     let pendingZoneChange = null;
@@ -833,7 +818,7 @@
     }
 
     // ==========================================
-    //  亮顯控制 (十字定位 Crosshair)
+    //  十字定位 (Crosshair Highlight)
     // ==========================================
     
     function highlightCrosshair(tableId, rowIdx, pIdx)
@@ -855,18 +840,17 @@
 
         // 3. 亮顯整欄 (Column)
         // pIdx 是 1-based (p1, p2...)
-        // 表格結構：Hole(0), Par(1), Hdcp(2), P1(3), P2(4)...
-        // 所以 DOM column index = pIdx + 2
+        // 表格結構：Hole(0), P1(1), P2(2)... (因為第一欄是 Hole/Par/Hdcp 合併)
         
         if (pIdx >= 1) {
-            const domColIdx = pIdx + 2; 
+            const domColIdx = pIdx; // 因為第一欄index=0, P1 index=1, 與 pIdx 一致
 
             // 亮顯該 Table 的所有該欄位
             const table = document.getElementById(`body-${tableId}`).closest('table');
             
             // 亮顯 Header (人名)
             const theadTh = table.querySelector(`thead tr th:nth-child(${domColIdx + 1})`); 
-            // nth-child 是 1-based，所以是 domColIdx + 1
+            // nth-child 是 1-based
             if (theadTh) theadTh.classList.add('active-col');
 
             // 亮顯 Body Cells
@@ -926,32 +910,45 @@
 
     function handleScoreClick(btn, par)
     {
+        // === 檢查人名是否輸入 ===
+        let parts = btn.id.split('-'); 
+        let tId = parseInt(parts[0].replace('table',''));
+        let rIdx = parseInt(parts[1].replace('row',''));
+        let pIdx = parseInt(parts[2].replace('p',''));
+        
+        let nameBtn = document.getElementById(`table${tId}-p${pIdx}-name`);
+        if (!nameBtn || nameBtn.innerText.trim() === "") 
+        {
+            return; 
+        }
+
         let text = btn.innerText;
         let nextVal;
         
+        // === 預設值為 PAR, 之後循環 9 -> 1 ===
         if (text === "")
         {
-            nextVal = par;
+            nextVal = par; // 第一下出現 PAR
         }
         else
         {
             let currentVal = parseInt(text);
             let maxLimit = Math.min(par * 2, 9);
             nextVal = currentVal + 1;
-            if (nextVal > maxLimit) nextVal = 1;
+            
+            // 超過最大值 -> 變 1 
+            if (nextVal > maxLimit) 
+            {
+                nextVal = 1; 
+            }
         }
         
         btn.innerText = nextVal;
         updateScoreVisual(btn, nextVal, par);
+
         updateAllBBCalculations();
         
-        // 解析 ID 來找出 table, row, p
-        let parts = btn.id.split('-'); 
-        let tId = parseInt(parts[0].replace('table',''));
-        let rIdx = parseInt(parts[1].replace('row',''));
-        let pIdx = parseInt(parts[2].replace('p',''));
-        
-        // 呼叫十字亮顯
+        // === 觸發十字定位 ===
         highlightCrosshair(tId, rIdx, pIdx);
 
         saveData();
@@ -991,6 +988,12 @@
     }
 
     function handleScoreLongPress(btn) {
+        let parts = btn.id.split('-'); 
+        let tId = parseInt(parts[0].replace('table',''));
+        let pIdx = parseInt(parts[2].replace('p',''));
+        let nameBtn = document.getElementById(`table${tId}-p${pIdx}-name`);
+        if (!nameBtn || nameBtn.innerText.trim() === "") return;
+
         btn.innerText = "";
         btn.className = "score-btn"; 
         updateAllBBCalculations();
@@ -1008,7 +1011,7 @@
         }
         lastBaClickTime = now;
 
-        // 雖然點的是 BA，但也同步亮顯該格位置
+        // 點 BA 也要觸發十字定位
         highlightCrosshair(tableId, rowIndex, playerIndex + 1);
 
         let clickedPlayerNameBtn = document.getElementById(`table${tableId}-p${playerIndex+1}-name`);
@@ -1097,26 +1100,33 @@
         saveData();
     }
 
-    // === 修改後的單純循環邏輯 ===
     function handleNameClick(btn)
     {
+        // === 名稱點擊：強制雙向同步，且只允許在前9修改 ===
+        let parts = btn.id.split('-');
+        let tId = parseInt(parts[0].replace('table',''));
+        let pIdx = parseInt(parts[1].replace('p',''));
+
+        // 後9按鈕已鎖定，這段其實是防禦性編碼
+        if (tId === 2) return; 
+
         let currentName = btn.innerText;
-        
-        // 建立完整列表：所有名字 + 空字串
         const fullCycleList = [...playerNames, ""];
-        
-        // 找出目前名字在列表中的位置
         let currIdx = fullCycleList.indexOf(currentName);
         if (currIdx === -1)
         {
-            currIdx = -1; // 找不到就當作重頭開始
+            currIdx = -1;
         }
-
-        // 往下一個索引移動
         let nextIdx = (currIdx + 1) % fullCycleList.length;
         let nextName = fullCycleList[nextIdx];
         
-        btn.innerText = nextName;
+        // 同步更新前9與後9
+        let t1Btn = document.getElementById(`table1-p${pIdx}-name`);
+        let t2Btn = document.getElementById(`table2-p${pIdx}-name`);
+        
+        if(t1Btn) t1Btn.innerText = nextName;
+        if(t2Btn) t2Btn.innerText = nextName;
+
         saveData();
     }
 
@@ -1145,8 +1155,7 @@
         const zoneData = COURSE_DATA[currentCourseName].zones[zoneName];
         let startHole = (currentCourseName === "豐原球場" && zoneName === "IN") ? 10 : 1;
 
-        // 加入 sticky-col 與對應的寬度 class
-        headerRow.innerHTML = `<th class="hole-col sticky-col col-hole">Hole</th><th class="par-col sticky-col col-par">PAR</th><th class="hdcp-col sticky-col col-hdcp">HDCP</th>`;
+        headerRow.innerHTML = `<th class="col-combined-header">Hole<br><span style="font-size:0.6em; opacity:0.8;">HDCP</span></th>`;
         
         for (let i = 0; i < playerNames.length; i++)
         {
@@ -1155,6 +1164,12 @@
             
             const nameBtn = document.createElement('button');
             nameBtn.className = 'player-name-btn';
+            
+            // === 後 9 名稱鎖定 (Lock Table 2 names) ===
+            if (tableId === 2) {
+                nameBtn.classList.add('locked');
+            }
+
             nameBtn.innerText = playerNames[i] || `玩家${i+1}`;
             nameBtn.id = `table${tableId}-p${i+1}-name`;
             nameBtn.onclick = function() { handleNameClick(this); };
@@ -1162,9 +1177,10 @@
 
             if (i === 0)
             {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'handicap-placeholder';
-                th.appendChild(placeholder);
+                const hostBtn = document.createElement('div');
+                hostBtn.className = 'host-btn'; 
+                hostBtn.innerText = '爐主';
+                th.appendChild(hostBtn);
             }
             else
             {
@@ -1206,7 +1222,17 @@
             let par = zoneData.par[i];
             let hdcp = zoneData.hdcp[i];
 
-            tr.innerHTML = `<td class="hole-col sticky-col col-hole">${displayHole}</td><td class="par-col sticky-col col-par">${par}</td><td class="hdcp-col sticky-col col-hdcp">${hdcp}</td>`;
+            let bgClass = 'bg-par-4';
+            if (par === 3) bgClass = 'bg-par-3';
+            else if (par >= 5) bgClass = 'bg-par-5';
+
+            tr.innerHTML = `
+                <td class="col-combined-cell ${bgClass}">
+                    <div class="cell-content">
+                        <div class="hole-val">${displayHole}</div>
+                        <div class="hdcp-val">${hdcp}</div>
+                    </div>
+                </td>`;
 
             for (let p = 0; p < playerNames.length; p++)
             {
@@ -1290,15 +1316,18 @@
                         const tr = el.closest('tr');
                         if (tr)
                         {
-                            const parCell = tr.children[1]; 
-                            if (parCell)
+                            let parts = id.split('-');
+                            let tId = parseInt(parts[0].replace('table',''));
+                            let rIdx = parseInt(parts[1].replace('row',''));
+                            
+                            let zName = (tId === 1) ? currentZone1 : currentZone2;
+                            let zData = COURSE_DATA[currentCourseName].zones[zName];
+                            let par = zData.par[rIdx];
+
+                            const score = parseInt(val);
+                            if (!isNaN(score) && !isNaN(par))
                             {
-                                const par = parseInt(parCell.innerText);
-                                const score = parseInt(val);
-                                if (!isNaN(score) && !isNaN(par))
-                                {
-                                    updateScoreVisual(el, score, par);
-                                }
+                                updateScoreVisual(el, score, par);
                             }
                         }
                     }
