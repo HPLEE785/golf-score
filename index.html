@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - 旗桿修復版(v36)</title>
+    <title>高爾夫分數紀錄卡 - 戰況統計版(v38)</title>
     <style>
         body 
         {
             font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
             background-color: #f4f7f6;
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 150px;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
@@ -107,6 +107,18 @@
             min-width: max-content;
         }
 
+        /* === PK 專區樣式 === */
+        .pk-header {
+            background-color: #e67e22;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
         table 
         {
             width: 100%;
@@ -159,13 +171,12 @@
             line-height: 1.2;
         }
         
-        /* HDCP 字體放大加深 */
         .hdcp-val {
-            font-size: 1.1em; /* 稍微調整大小以容納圖示 */
+            font-size: 1.2em; 
             color: #000; 
             font-weight: 900; 
-            margin-top: 4px;
-            opacity: 0.8;
+            margin-top: 2px;
+            opacity: 0.7;
         }
         .bg-par-3 .hdcp-val { color: #b71c1c; opacity: 1; }
         .bg-par-5 .hdcp-val { color: #01579b; opacity: 1; }
@@ -190,6 +201,12 @@
         tr.active-row .bg-par-4 { background-color: #fff9c4 !important; } 
         tr.active-row .bg-par-5 { background-color: #b2ebf2 !important; } 
 
+        .pk-hole-header {
+            font-weight: bold;
+            color: #333;
+            min-width: 40px;
+        }
+
         .player-header {
             min-width: 75px;
         }
@@ -209,15 +226,39 @@
             margin-bottom: 5px;
             min-height: 32px; 
         }
-        .player-name-btn:hover 
-        {
-            background-color: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
+        .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
+        .player-name-btn.locked { pointer-events: none; opacity: 0.9; }
+
+        .pk-name-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100px;
+            text-align: center;
         }
-        .player-name-btn.locked 
-        {
-            pointer-events: none;
-            opacity: 0.9;
+        
+        /* PK Status Text */
+        .pk-status {
+            margin-top: 4px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .pk-status.win { color: blue; }
+        .pk-status.lose { color: red; }
+        .pk-status.tie { color: #555; }
+
+        /* Info Row in Table A (Handicap + Total) */
+        .info-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
         }
 
         .handicap-btn 
@@ -232,7 +273,6 @@
             cursor: pointer;
             height: 24px;
             line-height: 20px;
-            box-sizing: border-box;
         }
 
         .host-btn 
@@ -246,8 +286,21 @@
             border-radius: 10px;
             height: 24px;
             line-height: 20px;
-            box-sizing: border-box;
             cursor: default;
+        }
+
+        /* 總桿顯示 */
+        .gross-score {
+            display: inline-block;
+            background-color: #2c3e50;
+            color: #fff;
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            height: 24px;
+            line-height: 20px;
+            min-width: 30px;
         }
 
         .stats-container 
@@ -272,7 +325,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: default;
             color: #333; 
         }
 
@@ -305,6 +357,21 @@
         .score-btn.style-birdie { border: 2px solid red; color: red; background-color: #fff; border-radius: 50%; }
         .score-btn.style-eagle { border: 2px solid red; color: red; background-color: #fff; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
 
+        .pk-score-cell {
+            font-size: 1.2em;
+            font-weight: bold;
+            width: 45px;
+            height: 50px;
+            vertical-align: middle;
+        }
+        .pk-result-cell {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .pk-result-cell.win { color: blue; background-color: #e3f2fd; }
+        .pk-result-cell.lose { color: red; background-color: #ffebee; }
+        
         .sub-btn-container 
         {
             display: flex;
@@ -313,26 +380,11 @@
             height: 28px;
         }
 
-        .btn-ba 
+        .btn-ba, .btn-bb 
         {
             width: 21px;
             height: 28px;
             background-color: #fff;
-            border: 1px solid #999;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #e74c3c;
-            cursor: pointer;
-            font-size: 13px;
-            padding: 0;
-        }
-        .btn-ba.active-bg { background-color: #dcedc8; border-color: #8bc34a; }
-
-        .btn-bb 
-        {
-            width: 21px;
-            height: 28px;
-            background-color: #f9f9f9; 
             border: 1px solid #ccc;
             border-radius: 4px;
             font-weight: bold;
@@ -340,11 +392,14 @@
             padding: 0;
             pointer-events: none; 
         }
+        .btn-ba { color: #e74c3c; border: 1px solid #999; cursor: pointer; pointer-events: auto; }
+        .btn-ba.active-bg { background-color: #dcedc8; border-color: #8bc34a; }
+        .btn-bb { background-color: #f9f9f9; }
         .btn-bb.win { color: blue; }
         .btn-bb.lose { color: red; }
         .btn-bb.handicap-applied { background-color: #ffe0e0 !important; border-color: #ffcccc !important; }
 
-        /* Modal Styles (只保留 Zone Alert) */
+        /* Modal Styles */
         .modal-overlay 
         {
             position: fixed;
@@ -367,36 +422,10 @@
             text-align: center;
             max-width: 500px;
             width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
         }
-        .modal-title 
-        {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        .modal-desc 
-        {
-            margin-bottom: 20px;
-            color: #555;
-        }
-        .modal-buttons 
-        {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .modal-btn 
-        {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-        }
+        .modal-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .modal-btn { padding: 10px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; }
         .btn-keep { background-color: #2980b9; color: white; }
         .btn-clear { background-color: #e67e22; color: white; }
         .btn-cancel { background-color: #95a5a6; color: white; }
@@ -444,6 +473,22 @@
         </table>
     </div>
 
+    <div class="card-container" style="border: 2px solid #e67e22;">
+        <div class="pk-header">
+            <span>⚔️ PK 專區 (18洞)</span>
+        </div>
+        <table id="pk-table">
+            <thead>
+                <tr id="pk-header-row"></tr>
+            </thead>
+            <tbody>
+                <tr id="pk-row-p1"></tr>
+                <tr id="pk-row-p2"></tr>
+                <tr id="pk-row-result"></tr>
+            </tbody>
+        </table>
+    </div>
+
     <div id="zone-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title">⚠️ 該球道已有資料</div>
@@ -461,9 +506,8 @@
     //  設定與資料
     // ==========================================
 
-    const STORAGE_KEY = 'golf_scorecard_v36_flag_fixed'; // Change Key to ensure clean start
+    const STORAGE_KEY = 'golf_scorecard_v38_status_gross';
     
-    // Updated List (13 players)
     const playerNames = [
         "張簡榮力", 
         "洪忠宜", 
@@ -483,49 +527,21 @@
     const COURSE_DATA = {
         "台中國際": {
             zones: {
-                "東區": {
-                    holes: ["東1", "東2", "東3", "東4", "東5", "東6", "東7", "東8", "東9"],
-                    par: [4, 4, 3, 5, 4, 4, 3, 5, 4],
-                    hdcp: [2, 8, 5, 4, 7, 1, 9, 3, 6]
-                },
-                "中區": {
-                    holes: ["中1", "中2", "中3", "中4", "中5", "中6", "中7", "中8", "中9"],
-                    par: [4, 4, 3, 5, 4, 4, 3, 4, 5],
-                    hdcp: [7, 2, 8, 5, 4, 1, 9, 3, 6]
-                },
-                "西區": {
-                    holes: ["西1", "西2", "西3", "西4", "西5", "西6", "西7", "西8", "西9"],
-                    par: [5, 4, 3, 4, 4, 3, 4, 5, 4],
-                    hdcp: [3, 6, 9, 8, 1, 4, 7, 2, 5]
-                }
+                "東區": { holes: ["東1", "東2", "東3", "東4", "東5", "東6", "東7", "東8", "東9"], par: [4, 4, 3, 5, 4, 4, 3, 5, 4], hdcp: [2, 8, 5, 4, 7, 1, 9, 3, 6] },
+                "中區": { holes: ["中1", "中2", "中3", "中4", "中5", "中6", "中7", "中8", "中9"], par: [4, 4, 3, 5, 4, 4, 3, 4, 5], hdcp: [7, 2, 8, 5, 4, 1, 9, 3, 6] },
+                "西區": { holes: ["西1", "西2", "西3", "西4", "西5", "西6", "西7", "西8", "西9"], par: [5, 4, 3, 4, 4, 3, 4, 5, 4], hdcp: [3, 6, 9, 8, 1, 4, 7, 2, 5] }
             }
         },
         "豐原球場": {
             zones: {
-                "OUT": {
-                    holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-                    par: [4, 5, 5, 3, 4, 4, 3, 4, 3],
-                    hdcp: [5, 3, 7, 15, 1, 9, 17, 11, 13]
-                },
-                "IN": {
-                    holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"],
-                    par: [5, 3, 4, 3, 4, 3, 5, 4, 5],
-                    hdcp: [4, 18, 2, 16, 10, 14, 12, 6, 8]
-                }
+                "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 5, 5, 3, 4, 4, 3, 4, 3], hdcp: [5, 3, 7, 15, 1, 9, 17, 11, 13] },
+                "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 3, 4, 3, 5, 4, 5], hdcp: [4, 18, 2, 16, 10, 14, 12, 6, 8] }
             }
         },
         "彰化球場": {
             zones: {
-                "OUT": {
-                    holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-                    par: [5, 3, 4, 4, 4, 5, 4, 4, 3],
-                    hdcp: [3, 17, 1, 11, 7, 13, 9, 5, 15]
-                },
-                "IN": {
-                    holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"],
-                    par: [5, 3, 4, 4, 4, 4, 3, 5, 5],
-                    hdcp: [4, 16, 2, 18, 6, 8, 14, 10, 12]
-                }
+                "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [5, 3, 4, 4, 4, 5, 4, 4, 3], hdcp: [3, 17, 1, 11, 7, 13, 9, 5, 15] },
+                "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 4, 4, 4, 3, 5, 5], hdcp: [4, 16, 2, 18, 6, 8, 14, 10, 12] }
             }
         }
     };
@@ -535,6 +551,233 @@
     let currentCourseName = "台中國際";
     let currentZone1 = "東區"; 
     let currentZone2 = "西區";
+
+    // PK State
+    let pk_p1_name = playerNames[0];
+    let pk_p2_name = playerNames[1];
+    let pk_p2_hdcp = 4;
+
+    // ==========================================
+    //  PK 專區邏輯 (18 Holes)
+    // ==========================================
+
+    function togglePkPlayer(playerIdx) {
+        let currentName = (playerIdx === 1) ? pk_p1_name : pk_p2_name;
+        let idx = playerNames.indexOf(currentName);
+        if (idx === -1) idx = 0;
+        let nextIdx = (idx + 1) % playerNames.length;
+        
+        if (playerIdx === 1) pk_p1_name = playerNames[nextIdx];
+        else pk_p2_name = playerNames[nextIdx];
+        
+        renderPkTable();
+        saveData();
+    }
+
+    function togglePkHdcp() {
+        pk_p2_hdcp = (pk_p2_hdcp + 1);
+        if (pk_p2_hdcp > 9) pk_p2_hdcp = 0;
+        renderPkTable();
+        saveData();
+    }
+
+    function renderPkTable() {
+        const z1Data = COURSE_DATA[currentCourseName].zones[currentZone1];
+        const z2Data = COURSE_DATA[currentCourseName].zones[currentZone2];
+
+        // 1. Header Row
+        let headerHTML = `<th style="min-width:100px;">PK 玩家</th>`;
+        for(let i=0; i<9; i++) {
+            let holeName = z1Data.holes ? z1Data.holes[i] : (i+1);
+            let par = z1Data.par[i];
+            let bgClass = (par === 3) ? 'bg-par-3' : (par >= 5 ? 'bg-par-5' : 'bg-par-4');
+            headerHTML += `<th class="pk-hole-header ${bgClass}">${holeName}</th>`;
+        }
+        for(let i=0; i<9; i++) {
+            let holeName = z2Data.holes ? z2Data.holes[i] : (i+10);
+            let par = z2Data.par[i];
+            let bgClass = (par === 3) ? 'bg-par-3' : (par >= 5 ? 'bg-par-5' : 'bg-par-4');
+            headerHTML += `<th class="pk-hole-header ${bgClass}">${holeName}</th>`;
+        }
+        headerHTML += `<th>Total</th>`;
+        document.getElementById('pk-header-row').innerHTML = headerHTML;
+
+        // 2. Data Gathering
+        let p1_idx = -1;
+        let p2_idx = -1;
+        for(let i=1; i<=playerNames.length; i++) {
+            let btn = document.getElementById(`table1-p${i}-name`);
+            if(btn && btn.innerText === pk_p1_name) p1_idx = i;
+            let btn2 = document.getElementById(`table1-p${i}-name`);
+            if(btn2 && btn2.innerText === pk_p2_name) p2_idx = i;
+        }
+
+        let p1Scores = [];
+        let p2Scores = [];
+        let pars = [];
+        let hdcps = [];
+
+        // Collect Scores
+        for(let i=0; i<9; i++) {
+            pars.push(z1Data.par[i]);
+            hdcps.push(z1Data.hdcp[i]);
+            let s1 = null, s2 = null;
+            if(p1_idx !== -1) {
+                let btn = document.getElementById(`table1-row${i}-p${p1_idx}-score`);
+                if(btn) s1 = parseInt(btn.innerText);
+            }
+            if(p2_idx !== -1) {
+                let btn = document.getElementById(`table1-row${i}-p${p2_idx}-score`);
+                if(btn) s2 = parseInt(btn.innerText);
+            }
+            p1Scores.push(isNaN(s1) ? null : s1);
+            p2Scores.push(isNaN(s2) ? null : s2);
+        }
+        for(let i=0; i<9; i++) {
+            pars.push(z2Data.par[i]);
+            hdcps.push(z2Data.hdcp[i]);
+            let s1 = null, s2 = null;
+            if(p1_idx !== -1) {
+                let btn = document.getElementById(`table2-row${i}-p${p1_idx}-score`);
+                if(btn) s1 = parseInt(btn.innerText);
+            }
+            if(p2_idx !== -1) {
+                let btn = document.getElementById(`table2-row${i}-p${p2_idx}-score`);
+                if(btn) s2 = parseInt(btn.innerText);
+            }
+            p1Scores.push(isNaN(s1) ? null : s1);
+            p2Scores.push(isNaN(s2) ? null : s2);
+        }
+
+        // 3. Calculate Result to determine status string
+        let grandTotal = 0;
+        for(let i=0; i<18; i++) {
+            let s1 = p1Scores[i];
+            let s2 = p2Scores[i];
+            let hdcp = hdcps[i];
+            if (s1 !== null && s2 !== null) {
+                let isHdcp = (hdcp <= pk_p2_hdcp);
+                let netS2 = s2;
+                if(isHdcp) netS2 -= 1;
+
+                if (netS2 < s1) { // P2 wins
+                    let pts = (s2 < pars[i]) ? 2 : 1;
+                    grandTotal += pts;
+                } else if (netS2 > s1) { // P1 wins
+                    let pts = (s1 < pars[i]) ? 2 : 1;
+                    grandTotal -= pts;
+                }
+            }
+        }
+
+        let p1Status = "平手";
+        let p2Status = "平手";
+        let p1StatusClass = "tie";
+        let p2StatusClass = "tie";
+
+        if(grandTotal > 0) {
+            p2Status = `贏 ${grandTotal} 洞`;
+            p2StatusClass = "win";
+            p1Status = `輸 ${grandTotal} 洞`;
+            p1StatusClass = "lose";
+        } else if(grandTotal < 0) {
+            let absVal = Math.abs(grandTotal);
+            p1Status = `贏 ${absVal} 洞`;
+            p1StatusClass = "win";
+            p2Status = `輸 ${absVal} 洞`;
+            p2StatusClass = "lose";
+        }
+
+        // 4. Render P1 Row
+        let p1RowHTML = `<td>
+            <button class="pk-name-btn" onclick="togglePkPlayer(1)">${pk_p1_name}</button>
+            <div class="host-btn" style="margin-top:2px;">爐主</div>
+            <div class="pk-status ${p1StatusClass}">${p1Status}</div>
+        </td>`;
+        let p1Total = 0;
+        for(let i=0; i<18; i++) {
+            let val = p1Scores[i];
+            let display = (val === null) ? "" : val;
+            let classStyle = "";
+            if(val !== null) {
+                p1Total += val;
+                let diff = val - pars[i];
+                if(diff===0) classStyle="style-par";
+                else if(diff===1) classStyle="style-bogey";
+                else if(diff>=2) classStyle="style-double-bogey";
+                else if(diff===-1) classStyle="style-birdie";
+                else if(diff<=-2) classStyle="style-eagle";
+            }
+            p1RowHTML += `<td class="pk-score-cell ${classStyle}">${display}</td>`;
+        }
+        p1RowHTML += `<td style="font-weight:bold;">${p1Total > 0 ? p1Total : ''}</td>`;
+        document.getElementById('pk-row-p1').innerHTML = p1RowHTML;
+
+        // 5. Render P2 Row
+        let p2RowHTML = `<td>
+            <button class="pk-name-btn" onclick="togglePkPlayer(2)">${pk_p2_name}</button>
+            <div class="handicap-btn" style="margin-top:2px;" onclick="togglePkHdcp()">讓 ${pk_p2_hdcp}</div>
+            <div class="pk-status ${p2StatusClass}">${p2Status}</div>
+        </td>`;
+        let p2Total = 0;
+        for(let i=0; i<18; i++) {
+            let val = p2Scores[i];
+            let display = (val === null) ? "" : val;
+            let classStyle = "";
+            if(val !== null) {
+                p2Total += val;
+                let diff = val - pars[i];
+                if(diff===0) classStyle="style-par";
+                else if(diff===1) classStyle="style-bogey";
+                else if(diff>=2) classStyle="style-double-bogey";
+                else if(diff===-1) classStyle="style-birdie";
+                else if(diff<=-2) classStyle="style-eagle";
+            }
+            p2RowHTML += `<td class="pk-score-cell ${classStyle}">${display}</td>`;
+        }
+        p2RowHTML += `<td style="font-weight:bold;">${p2Total > 0 ? p2Total : ''}</td>`;
+        document.getElementById('pk-row-p2').innerHTML = p2RowHTML;
+
+        // 6. Result Row
+        let resRowHTML = `<td style="font-weight:bold;">BB 結果</td>`;
+        for(let i=0; i<18; i++) {
+            let resultText = "";
+            let s1 = p1Scores[i];
+            let s2 = p2Scores[i];
+            let par = pars[i];
+            let hdcp = hdcps[i];
+
+            if (s1 !== null && s2 !== null) {
+                let isHdcp = (hdcp <= pk_p2_hdcp);
+                let netS2 = s2;
+                if(isHdcp) netS2 -= 1;
+
+                if (netS2 < s1) {
+                    let pts = (s2 < par) ? 2 : 1;
+                    resultText = `+${pts}`;
+                } else if (netS2 > s1) {
+                    let pts = (s1 < par) ? 2 : 1;
+                    resultText = `-${pts}`;
+                } else {
+                    resultText = "0";
+                }
+            }
+            let cellClass = "";
+            if(resultText.startsWith('+')) cellClass = "win";
+            if(resultText.startsWith('-')) cellClass = "lose";
+            resRowHTML += `<td class="pk-result-cell ${cellClass}">${resultText}</td>`;
+        }
+
+        let totalClass = "";
+        let totalStr = grandTotal.toString();
+        if(grandTotal > 0) { totalStr = "+" + grandTotal; totalClass = "win"; }
+        if(grandTotal < 0) { totalClass = "lose"; }
+        if(grandTotal === 0) totalStr = "0";
+
+        resRowHTML += `<td class="pk-result-cell ${totalClass}">${totalStr}</td>`;
+        document.getElementById('pk-row-result').innerHTML = resRowHTML;
+    }
+
 
     // ==========================================
     //  球道切換邏輯
@@ -664,7 +907,7 @@
 
 
     // ==========================================
-    //  統計邏輯
+    //  統計邏輯 & 總桿計算
     // ==========================================
     
     function updateTotals()
@@ -672,15 +915,29 @@
         let count = playerNames.length;
         let baCounts = new Array(count).fill(0);
         let bbSums = new Array(count).fill(0);
+        
+        // 分開計算每個 Table 的總桿
+        // 我們直接在 loop 內處理
 
         for (let t = 1; t <= 2; t++)
         {
+            // Reset table gross scores temp
+            let tableGrossScores = new Array(count).fill(0);
+
             for (let r = 0; r < 9; r++)
             {
                 for (let pIndex = 0; pIndex < count; pIndex++)
                 { 
                     let pNum = pIndex + 1;
                     
+                    // --- 總桿計算 ---
+                    const scoreBtn = document.getElementById(`table${t}-row${r}-p${pNum}-score`);
+                    if(scoreBtn) {
+                        let s = parseInt(scoreBtn.innerText);
+                        if(!isNaN(s)) tableGrossScores[pIndex] += s;
+                    }
+
+                    // BA/BB
                     if (pIndex < 4) 
                     {
                         const baBtn = document.getElementById(`table${t}-row${r}-p${pNum}-ba`);
@@ -704,10 +961,18 @@
                     }
                 }
             }
+
+            // 更新該 Table 的 總桿顯示
+            for(let pIndex=0; pIndex<count; pIndex++) {
+                let grossEl = document.getElementById(`table${t}-gross-p${pIndex+1}`);
+                if(grossEl) {
+                    grossEl.innerText = tableGrossScores[pIndex] > 0 ? tableGrossScores[pIndex] : "0";
+                }
+            }
         }
 
         let p1Total = 0;
-        for (let i = 1; i < 4; i++) // 只計算 P2-P4
+        for (let i = 1; i < 4; i++) 
         {
             p1Total -= bbSums[i];
         }
@@ -822,6 +1087,7 @@
         });
         
         updateTotals();
+        renderPkTable(); 
     }
 
     function updateBBDisplay(tableId, rowIndex, playerIndex, text, isHdcp)
@@ -1128,6 +1394,7 @@
         if(t2Btn) t2Btn.innerText = nextName;
 
         saveData();
+        renderPkTable(); 
     }
 
     // ==========================================
@@ -1143,6 +1410,7 @@
         renderTable(2, currentZone2);
 
         loadInputValues();
+        renderPkTable();
     }
 
     function renderTable(tableId, zoneName)
@@ -1174,12 +1442,16 @@
             nameBtn.onclick = function() { handleNameClick(this); };
             th.appendChild(nameBtn);
 
+            // Container for Info Row (Status/Handicap + Total Score)
+            const infoRow = document.createElement('div');
+            infoRow.className = 'info-row';
+
             if (i === 0)
             {
                 const hostBtn = document.createElement('div');
                 hostBtn.className = 'host-btn'; 
                 hostBtn.innerText = '爐主';
-                th.appendChild(hostBtn);
+                infoRow.appendChild(hostBtn);
             }
             else
             {
@@ -1188,8 +1460,17 @@
                 hdcpBtn.innerText = '讓 4';
                 hdcpBtn.id = `table${tableId}-hdcp-p${i+1}`; 
                 hdcpBtn.onclick = function() { handleHdcpClick(this); };
-                th.appendChild(hdcpBtn);
+                infoRow.appendChild(hdcpBtn);
             }
+            
+            // 總桿顯示
+            const grossScoreDiv = document.createElement('div');
+            grossScoreDiv.className = 'gross-score';
+            grossScoreDiv.id = `table${tableId}-gross-p${i+1}`;
+            grossScoreDiv.innerText = "0";
+            infoRow.appendChild(grossScoreDiv);
+
+            th.appendChild(infoRow);
 
             const statsDiv = document.createElement('div');
             statsDiv.className = 'stats-container';
@@ -1285,14 +1566,15 @@
         {
             course: currentCourseName,
             zone1: currentZone1,
-            zone2: currentZone2
+            zone2: currentZone2,
+            pk: { p1: pk_p1_name, p2: pk_p2_name, hdcp: pk_p2_hdcp }
         };
         const values = {};
         const elements = document.querySelectorAll('[id]');
         elements.forEach(el => 
         {
             if (el.id === 'course-selector' || el.id.startsWith('zone-btn') || el.id.startsWith('header') || el.id.startsWith('body')) return;
-            if (el.id === 'edit-player-list' || el.id === 'edit-course-data') return;
+            if (el.id.startsWith('pk-')) return; 
             values[el.id] = el.innerText;
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, values }));
@@ -1362,6 +1644,11 @@
                     currentCourseName = data.settings.course;
                     currentZone1 = data.settings.zone1;
                     currentZone2 = data.settings.zone2;
+                    if(data.settings.pk) {
+                        pk_p1_name = data.settings.pk.p1 || playerNames[0];
+                        pk_p2_name = data.settings.pk.p2 || playerNames[1];
+                        pk_p2_hdcp = data.settings.pk.hdcp || 4;
+                    }
                 }
             }
             catch (e) {}
