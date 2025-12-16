@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v51 版面微調版</title>
+    <title>高爾夫分數紀錄卡 - v53</title>
     <style>
         /* =========================================
            1. 全域與版面設定
@@ -33,7 +33,6 @@
             gap: 6px; 
             font-size: 1em;
         }
-
         .control-group { display: flex; align-items: center; gap: 4px; }
         .label-text { font-weight: bold; color: #333; font-size: 0.9em; }
         
@@ -45,22 +44,22 @@
 
         .zone-select-btn 
         {
-            background-color: #27ae60; color:white; border:none; padding:6px 12px;
-            border-radius:20px; font-weight:bold; cursor:pointer; font-size:1.1em;
+            background-color: #27ae60; color: white; border: none; padding: 6px 12px;
+            border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1.1em;
             min-width: 120px; white-space: nowrap; text-align: center;
         }
 
         .btn-reset 
         {
-            background-color:#7f8c8d; color:white; border:none; padding:6px 10px;
-            border-radius:4px; cursor:pointer; font-size:0.9em; font-weight:bold;
+            background-color: #7f8c8d; color: white; border: none; padding: 6px 10px;
+            border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold;
         }
 
         .edit-toggle-label 
         {
-            display:flex; align-items:center; font-size:0.9em; color:#c0392b;
-            font-weight:bold; border:1px solid #c0392b; padding:4px 8px;
-            border-radius:4px; background:#fff;
+            display: flex; align-items: center; font-size: 0.9em; color: #c0392b;
+            font-weight: bold; border: 1px solid #c0392b; padding: 4px 8px;
+            border-radius: 4px; background: #fff;
         }
 
         /* =========================================
@@ -68,24 +67,23 @@
            ========================================= */
         .card-container 
         {
-            max-width:100%; margin:0 auto 15px auto; background:white;
-            box-shadow:0 4px 6px rgba(0,0,0,0.1); border-radius:8px;
-            overflow:hidden; overflow-x:auto; 
+            max-width: 100%; margin: 0 auto 15px auto; background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px;
+            overflow: hidden; overflow-x: auto; 
         }
 
         .zone-header 
         {
-            background-color:#27ae60; color:white; padding:8px 12px;
-            font-size:1.3em; font-weight:bold; display:flex; gap:10px;
+            background-color: #27ae60; color: white; padding: 8px 12px;
+            font-size: 1.3em; font-weight: bold; display: flex; gap: 10px;
         }
 
-        table { width:100%; border-collapse:collapse; text-align:center; min-width:800px; }
-        th,td { border:1px solid #ddd; padding:2px 1px; background:#fff; }
-        thead th { background:#7f8c8d; color:white; }
+        table { width: 100%; border-collapse: collapse; text-align: center; min-width: 800px; }
+        th, td { border: 1px solid #ddd; padding: 2px 1px; background: #fff; }
+        thead th { background: #7f8c8d; color: white; }
         
-        /* 洞號欄位 */
-        .col-combined-header { width:50px; background:#546e7a !important; color:white; font-size: 0.9em; }
-        .col-combined-cell { border-right: 2px solid #ccc; padding: 2px !important; cursor:pointer; }
+        .col-combined-header { width: 50px; background: #546e7a !important; color: white; font-size: 0.9em; }
+        .col-combined-cell { border-right: 2px solid #ccc; padding: 2px !important; cursor: pointer; }
         .col-combined-cell div { line-height: 1.1; }
         
         .hole-val { font-size: 1.1em; font-weight: bold; }
@@ -99,11 +97,11 @@
            ========================================= */
         @keyframes blink-red 
         { 
-            0% {color:red;opacity:1;} 50% {color:red;opacity:0.3;} 100% {color:red;opacity:1;} 
+            0% { color: red; opacity: 1; } 50% { color: red; opacity: 0.3; } 100% { color: red; opacity: 1; } 
         }
         
         .cell-content.editing .hole-val, 
-        .cell-content.editing .hdcp-val { color:red !important; animation:blink-red 1s infinite; }
+        .cell-content.editing .hdcp-val { color: red !important; animation: blink-red 1s infinite; }
         
         tr.active-editing-row td 
         {
@@ -112,142 +110,115 @@
             border-bottom: 2px solid #fbc02d;
         }
 
-        .score-btn.locked-btn { opacity:0.6; cursor:not-allowed; background-color:#eee; }
+        .score-btn.locked-btn { opacity: 0.6; cursor: not-allowed; background-color: #eee; }
 
         /* =========================================
            4. 分數顯示樣式
            ========================================= */
         .score-btn 
         { 
-            width:32px; height:32px; font-size:16px; font-weight:bold; border-radius:4px; 
-            cursor:pointer; margin-bottom:2px; transition:all 0.1s; background-color:#fff; 
-            border:1px dashed #ccc; color:#ccc; -webkit-user-select:none; padding:0; 
+            width: 32px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 4px; 
+            cursor: pointer; margin-bottom: 2px; transition: all 0.1s; background-color: #fff; 
+            border: 1px dashed #ccc; color: #ccc; -webkit-user-select: none; padding: 0; 
         }
-        .score-btn:active { transform:scale(0.95); }
+        .score-btn:active { transform: scale(0.95); }
         
-        .score-btn.style-par { background:#ffcc80; border:1px solid #ef6c00; color:#000; }
-        .score-btn.style-bogey { border:2px solid #000; color:#000; }
-        .score-btn.style-double-bogey { border:2px solid #000; color:#000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
-        .score-btn.style-birdie { border:2px solid red; color:red; border-radius:50%; }
-        .score-btn.style-eagle { border:2px solid red; color:red; border-radius:50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
+        .score-btn.style-par { background: #ffcc80; border: 1px solid #ef6c00; color: #000; }
+        .score-btn.style-bogey { border: 2px solid #000; color: #000; }
+        .score-btn.style-double-bogey { border: 2px solid #000; color: #000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
+        .score-btn.style-birdie { border: 2px solid red; color: red; border-radius: 50%; }
+        .score-btn.style-eagle { border: 2px solid red; color: red; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
 
         /* =========================================
            5. 玩家與功能按鈕
            ========================================= */
-        
-        /* [設定] 玩家1..4 寬度修改處 */
-        .player-header 
-        { 
-            min-width: 90px; /* <--- 已修改為 90px */
-        }
+        .player-header { min-width: 90px; }
 
         .player-name-btn 
         { 
-            background:none; border:1px solid transparent; font-size:0.95em; font-weight:bold; color:white; 
-            cursor:pointer; padding:2px; width:100%; border-radius:4px; display:block; margin-bottom:2px; 
-            min-height:28px; overflow:hidden; text-overflow:ellipsis; 
+            background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; 
+            cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; 
+            min-height: 28px; overflow: hidden; text-overflow: ellipsis; 
         }
-        .player-name-btn:hover { background-color:rgba(255,255,255,0.2); }
-        .player-name-btn.locked { pointer-events:none; }
+        .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
+        .player-name-btn.locked { pointer-events: none; }
 
-        .info-row { display:flex; justify-content:center; align-items:center; gap:1px; margin-bottom:2px; }
-        .handicap-btn { display:inline-block; background-color:#e8f4f8; border:1px solid #b3d7ff; color:#0056b3; padding:0 2px; border-radius:6px; cursor:pointer; height:20px; line-height:18px; font-size:0.8em; min-width:30px; }
-        .host-btn { display:inline-block; background-color:#fff3e0; border:1px solid #ffe0b2; color:#ef6c00; padding:0 2px; border-radius:6px; height:20px; line-height:18px; font-size:0.8em; cursor:default; }
+        .info-row { display: flex; justify-content: center; align-items: center; gap: 1px; margin-bottom: 2px; }
+        .handicap-btn { display: inline-block; background-color: #e8f4f8; border: 1px solid #b3d7ff; color: #0056b3; padding: 0 2px; border-radius: 6px; cursor: pointer; height: 20px; line-height: 18px; font-size: 0.8em; min-width: 30px; }
+        .host-btn { display: inline-block; background-color: #fff3e0; border: 1px solid #ffe0b2; color: #ef6c00; padding: 0 2px; border-radius: 6px; height: 20px; line-height: 18px; font-size: 0.8em; cursor: default; }
         
-        .stats-container { display:flex; justify-content:center; gap:1px; margin-top:2px; padding-top:2px; border-top:1px dashed rgba(255,255,255,0.3); }
-        .stats-btn { width:24px; height:20px; font-size:11px; font-weight:bold; border-radius:3px; border:1px solid #bdc3c7; background:#fff; display:flex; align-items:center; justify-content:center; cursor:default; color:#333; }
-        .stats-ba { color:#e74c3c; border-color:#e74c3c; }
-        .stats-bb { color:#2980b9; border-color:#2980b9; }
-        .stats-bb.negative { color:red; background-color:#ffebee; }
-        .stats-bb.positive { color:blue; background-color:#e3f2fd; }
+        .stats-container { display: flex; justify-content: center; gap: 1px; margin-top: 2px; padding-top: 2px; border-top: 1px dashed rgba(255,255,255,0.3); }
+        .stats-btn { width: 24px; height: 20px; font-size: 11px; font-weight: bold; border-radius: 3px; border: 1px solid #bdc3c7; background: #fff; display: flex; align-items: center; justify-content: center; cursor: default; color: #333; }
+        .stats-ba { color: #e74c3c; border-color: #e74c3c; }
+        .stats-bb { color: #2980b9; border-color: #2980b9; }
+        .stats-bb.negative { color: red; background-color: #ffebee; }
+        .stats-bb.positive { color: blue; background-color: #e3f2fd; }
 
-        .sub-btn-container { display:flex; justify-content:center; gap:1px; height:22px; }
-        .btn-ba, .btn-bb { width:15px; height:22px; background:#fff; border:1px solid #ccc; border-radius:3px; font-weight:bold; font-size:9px; padding:0; pointer-events:none; }
+        .sub-btn-container { display: flex; justify-content: center; gap: 1px; height: 22px; }
+        .btn-ba, .btn-bb { width: 15px; height: 22px; background: #fff; border: 1px solid #ccc; border-radius: 3px; font-weight: bold; font-size: 9px; padding: 0; pointer-events: none; }
         
-        .btn-ba { color:#e74c3c; border:1px solid #999; cursor:pointer; pointer-events:auto; }
-        .btn-ba.active-bg 
-        { 
-            background-color: #81c784 !important; 
-            border-color: #4caf50 !important;
-        }
+        .btn-ba { color: #e74c3c; border: 1px solid #999; cursor: pointer; pointer-events: auto; }
+        .btn-ba.active-bg { background-color: #81c784 !important; border-color: #4caf50 !important; }
         
-        .btn-bb { background:#f9f9f9; color:blue; } .btn-bb.lose { color:red; }
-        .btn-bb.handicap-applied { background-color:#ffe0e0 !important; border-color:#ffcccc !important; }
+        .btn-bb { background: #f9f9f9; color: blue; } .btn-bb.lose { color: red; }
+        .btn-bb.handicap-applied { background-color: #ffe0e0 !important; border-color: #ffcccc !important; }
 
         /* =========================================
            6. 總桿與 PK 樣式
            ========================================= */
         tr.total-row td 
         {
-            background-color: #34495e !important;
-            color: white;
-            font-weight: bold;
-            border-top: 2px solid #2c3e50;
-            padding: 4px;
-            vertical-align: middle;
+            background-color: #34495e !important; color: white; font-weight: bold;
+            border-top: 2px solid #2c3e50; padding: 4px; vertical-align: middle;
         }
         .total-label { font-size: 0.9em; line-height: 1.4; }
         .total-display-container { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
         .val-sub { font-size: 1.2em; color: #f1c40f; margin-bottom: 2px; } 
         .val-grand { font-size: 0.9em; color: #fff; border-top: 1px solid rgba(255,255,255,0.3); width: 80%; } 
 
-        .pk-header { background:#e67e22; color:white; padding:8px 12px; display:flex; align-items:center; gap:10px; font-size:1.2em; font-weight:bold; }
-        .pk-hole-header { font-weight:bold; color:#333; min-width:30px; font-size:0.9em; }
-        .pk-score-cell { font-size:1.1em; font-weight:bold; width:35px; height:40px; vertical-align:middle; }
-        .pk-result-cell { font-size:1.1em; font-weight:bold; color:#2980b9; }
-        .pk-result-cell.win { color:blue; background:#e3f2fd; }
-        .pk-result-cell.lose { color:red; background:#ffebee; }
+        .pk-header { background: #e67e22; color: white; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 1.2em; font-weight: bold; }
+        .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
+        .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
+        .pk-result-cell { font-size: 1.1em; font-weight: bold; color: #2980b9; }
+        .pk-result-cell.win { color: blue; background: #e3f2fd; }
+        .pk-result-cell.lose { color: red; background: #ffebee; }
         
-        /* [修改] PK 名字寬度改為 auto */
         .pk-name-btn 
         { 
-            background:#f39c12; color:white; border:none; padding:4px 4px; border-radius:4px; 
-            font-size:1.0em; font-weight:bold; cursor:pointer; 
-            width: auto; /* 不強制寬度 */
-            min-width: 50px; 
-            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; 
+            background: #f39c12; color: white; border: none; padding: 4px 4px; border-radius: 4px; 
+            font-size: 1.0em; font-weight: bold; cursor: pointer; 
+            width: auto; min-width: 50px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
-        .pk-status { font-size:0.9em; font-weight:bold; margin-top:2px; }
-        .pk-status.win { color:blue; } .pk-status.lose { color:red; }
+        .pk-status { font-size: 0.9em; font-weight: bold; margin-top: 2px; }
+        .pk-status.win { color: blue; } .pk-status.lose { color: red; }
 
         /* =========================================
-           7. 底部輸入框 (2x2 排列)
+           7. 底部輸入框
            ========================================= */
-        .custom-player-area { background:#fff; padding:10px; margin:10px auto; max-width:100%; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-        .custom-player-title { font-weight:bold; color:#555; margin-bottom:5px; display:block; }
+        .custom-player-area { background: #fff; padding: 10px; margin: 10px auto; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .custom-player-title { font-weight: bold; color: #555; margin-bottom: 5px; display: block; }
         
-        .custom-input-group 
-        { 
-            display:flex; 
-            gap:6px; 
-            flex-wrap:wrap; 
-        }
-        
-        .custom-input 
-        { 
-            padding:8px; border:1px solid #ccc; border-radius:4px; 
-            /* [修改] 強制 50% 減去間距，形成兩行排列 */
-            flex: 0 0 calc(50% - 3px); 
-            box-sizing: border-box;
-        }
+        .custom-input-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .custom-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 0 0 calc(50% - 3px); box-sizing: border-box; }
 
-        /* PAR 顏色 */
-        .bg-par-3 { background-color:#ffcdd2 !important; color:#b71c1c; }
-        .bg-par-4 { background-color:#ffffff !important; color:#333; }
-        .bg-par-5 { background-color:#b3e5fc !important; color:#01579b; }
-        tr.active-row td { background-color:#fff9c4 !important; }
-        tr.active-row .bg-par-3 { background-color:#ffccbc !important; }
-        tr.active-row .bg-par-4 { background-color:#fff9c4 !important; }
-        tr.active-row .bg-par-5 { background-color:#b2ebf2 !important; }
+        /* PAR 背景色 */
+        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; }
+        .bg-par-4 { background-color: #ffffff !important; color: #333; }
+        .bg-par-5 { background-color: #b3e5fc !important; color: #01579b; }
+        tr.active-row td { background-color: #fff9c4 !important; }
+        tr.active-row .bg-par-3 { background-color: #ffccbc !important; }
+        tr.active-row .bg-par-4 { background-color: #fff9c4 !important; }
+        tr.active-row .bg-par-5 { background-color: #b2ebf2 !important; }
 
-        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:9999; }
-        .modal-box { background:white; padding:20px; border-radius:8px; width:90%; max-width:400px; text-align:center; }
-        .modal-title { font-size:1.2em; font-weight:bold; margin-bottom:10px; color:#2c3e50; }
-        .modal-buttons { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
-        .modal-btn { padding:10px; border:none; border-radius:5px; font-size:1em; cursor:pointer; }
-        .btn-keep { background:#2980b9; color:white; }
-        .btn-clear { background:#e67e22; color:white; }
-        .btn-cancel { background:#95a5a6; color:white; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
+        .modal-title { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .modal-btn { padding: 10px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; }
+        .btn-keep { background: #2980b9; color: white; }
+        .btn-clear { background: #e67e22; color: white; }
+        .btn-cancel { background: #95a5a6; color: white; }
     </style>
 </head>
 <body>
@@ -262,7 +233,7 @@
         <input type="checkbox" id="edit-player-check" style="margin-right:4px;"> 編輯玩家
     </label>
 
-    <button class="btn-reset" onclick="resetAllData()">⚠️ 清除</button>
+    <button class="btn-reset" onclick="resetAllData()">⚠️ 清除 v53</button>
 
     <div class="control-group" style="margin-left:5px;">
         <span class="label-text">前 9 :</span>
@@ -323,9 +294,9 @@
 
 <script>
 // ============================================
-//  1. 資料定義與全域變數
+//  1. 資料定義 (包含新球場資料)
 // ============================================
-const STORAGE_KEY = 'golf_scorecard_v51_width_fix'; 
+const STORAGE_KEY = 'golf_scorecard_v53_version_display'; 
 
 const basePlayerNames = [
     "張簡榮力", "洪忠宜", "陳振峯", "趙振明", 
@@ -355,6 +326,24 @@ const COURSE_DATA = {
             "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [5, 3, 4, 4, 4, 5, 4, 4, 3], hdcp: [3, 17, 1, 11, 7, 13, 9, 5, 15] },
             "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 4, 4, 4, 3, 5, 5], hdcp: [4, 16, 2, 18, 6, 8, 14, 10, 12] }
         }
+    },
+    "清泉崗球場": {
+        zones: {
+            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 4, 4, 3, 4, 4, 5, 4, 4], hdcp: [11, 1, 5, 9, 3, 15, 7, 13, 17] },
+            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [4, 3, 4, 5, 4, 4, 5, 3, 4], hdcp: [4, 12, 16, 8, 10, 2, 6, 18, 14] }
+        }
+    },
+    "全國球場": {
+        zones: {
+            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 4, 5, 4, 3, 4, 5, 3, 4], hdcp: [17, 11, 9, 5, 13, 1, 3, 15, 7] },
+            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [4, 3, 4, 5, 3, 4, 5, 4, 4], hdcp: [18, 16, 12, 10, 14, 2, 4, 6, 8] }
+        }
+    },
+    "南峰球場": {
+        zones: {
+            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [5, 4, 4, 3, 4, 4, 3, 5, 4], hdcp: [3, 9, 15, 13, 5, 1, 17, 11, 7] },
+            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 4, 3, 4, 5, 4, 4], hdcp: [4, 18, 10, 6, 14, 2, 8, 12, 16] }
+        }
     }
 };
 
@@ -364,7 +353,7 @@ let currentCourseName = "台中國際";
 let currentZone1 = "東區"; 
 let currentZone2 = "西區";
 
-// 記錄當前正在編輯的行 (Row Index)
+// 記錄當前正在編輯的行 (Row Index)，用於控制閃爍和高亮
 let activeEditingRow = null; 
 
 // PK 設定變數
@@ -377,7 +366,7 @@ let pk_p2_hdcp_b9 = 4;
 //  2. 狀態校正與玩家更新
 // ============================================
 
-// 防呆機制：確保球場切換時，區域名稱正確
+// ★ 防呆機制：防止切換球場時，因找不到區域而當機
 function validateState() 
 {
     if (!COURSE_DATA[currentCourseName]) 
@@ -385,6 +374,7 @@ function validateState()
         currentCourseName = "台中國際";
     }
     const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
+    // 如果目前的區域名稱不存在於目前的球場，強制重置為前兩個區域
     if (!zones.includes(currentZone1)) currentZone1 = zones[0];
     if (!zones.includes(currentZone2)) currentZone2 = zones.length > 1 ? zones[1] : zones[0];
 }
@@ -414,7 +404,7 @@ function toggleCourse()
     let idx = courses.indexOf(currentCourseName);
     currentCourseName = courses[(idx + 1) % courses.length];
     
-    // 切換球場時，強制重置區域，防止當機
+    // ★ 切換球場時，強制重置區域，防止當機
     const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
     currentZone1 = zones[0];
     currentZone2 = zones.length > 1 ? zones[1] : zones[0];
@@ -431,7 +421,7 @@ function tryToggleZone(tableId)
     let idx = zones.indexOf(currentZone);
     let nextZone = zones[(idx + 1) % zones.length];
 
-    // 如果表格有資料，跳出確認視窗
+    // 如果表格有資料，跳出確認視窗，避免誤刪
     if (hasDataInTable(tableId)) 
     {
         pendingZoneChange = { tableId: tableId, nextZone: nextZone };
@@ -461,9 +451,10 @@ function applyZoneChange(tableId, nextZone, shouldClear)
     if (tableId === 1) currentZone1 = nextZone;
     else currentZone2 = nextZone;
 
-    // 先切換區域重畫，再決定是否清除資料
+    // 先切換區域重畫
     renderAll(); 
 
+    // ★ 如果使用者選擇「清除」，則強制清空該表格
     if (shouldClear) 
     {
         clearTableData(tableId);
@@ -496,7 +487,7 @@ function clearTableData(tableId)
 //  4. 表格操作 (點擊洞號、輸入分數、點名、BA)
 // ============================================
 
-// 點擊洞號：進入編輯模式 + 自動填入 PAR (若全空)
+// 點擊洞號：進入編輯模式 + 自動填入 PAR (若該洞全空)
 function handleHoleClick(tableId, rowIdx) 
 {
     if (activeEditingRow && activeEditingRow.tableId === tableId && activeEditingRow.rowIdx === rowIdx) 
@@ -507,7 +498,7 @@ function handleHoleClick(tableId, rowIdx)
     {
         activeEditingRow = { tableId: tableId, rowIdx: rowIdx };
 
-        // 自動填 PAR 邏輯
+        // ★ 自動填 PAR 邏輯
         const zName = (tableId === 1) ? currentZone1 : currentZone2;
         const zData = COURSE_DATA[currentCourseName].zones[zName];
         if(zData)
@@ -619,6 +610,7 @@ function handleScoreClick(btn, par)
 
     let parts = btn.id.split('-'); 
     let tId = parseInt(parts[0].replace('table',''));
+    let rIdx = parseInt(parts[1].replace('row',''));
     let pIdx = parseInt(parts[2].replace('p',''));
     
     let nameBtn = document.getElementById(`table${tId}-p${pIdx}-name`);
@@ -682,7 +674,7 @@ function handleBAClick(tableId, rowIndex, playerIndex)
         hasActiveO = true;
     }
     
-    // 統一變色
+    // ★ 統一變色
     rowButtons.forEach(btn => 
     {
         if (hasActiveO) 
@@ -932,6 +924,9 @@ function updateAllBBCalculations()
         const zName = (tableId === 1) ? currentZone1 : currentZone2;
         const zData = COURSE_DATA[currentCourseName].zones[zName];
         
+        // ★ 核心修正：將當前 9 洞的 HDCP 複製出來並排序
+        const sortedHdcpList = [...zData.hdcp].sort((a, b) => a - b);
+        
         for(let r=0; r<9; r++) 
         {
             const par = zData.par[r];
@@ -948,7 +943,19 @@ function updateAllBBCalculations()
                 const hBtn = document.getElementById(`table${tableId}-hdcp-p${i}`);
                 let hSet = parseInt(hBtn.innerText.replace('讓 ',''));
                 
-                let isHdcp = (hdcp <= hSet);
+                // ★ 計算讓桿門檻值：
+                // 例如讓 4 桿，我們就找 sortedHdcpList 第 4 個數值 (index 3)
+                // 任何 HDCP <= 這個數值的洞，都要讓桿
+                let cutoffHdcp = 0;
+                if (hSet > 0) 
+                {
+                    // 防止 index 超出範圍 (雖然讓桿最多9)
+                    let safeIndex = Math.min(hSet, 9) - 1;
+                    cutoffHdcp = sortedHdcpList[safeIndex];
+                }
+                
+                let isHdcp = (hdcp <= cutoffHdcp);
+                
                 updateBBDisplay(tableId, r, i, "", isHdcp); 
                 
                 if(!isNaN(s1) && !isNaN(sVal)) 
