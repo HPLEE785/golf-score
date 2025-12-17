@@ -3,150 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v53</title>
+    <title>高爾夫分數紀錄卡 - v58 12人版</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           1. 全域與版面設定
+           CSS 樣式表 (v58)
            ========================================= */
-        body 
-        {
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
-            background-color: #f4f7f6;
-            padding: 5px;
-            padding-bottom: 300px;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        .main-controls 
-        {
-            max-width: 100%; 
-            margin: 0 auto 10px auto;
-            background: #fff;
-            padding: 8px; 
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 6px; 
-            font-size: 1em;
-        }
+        body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        
+        /* 控制面板 */
+        .main-controls { max-width: 100%; margin: 0 auto 10px auto; background: #fff; padding: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 1em; }
         .control-group { display: flex; align-items: center; gap: 4px; }
         .label-text { font-weight: bold; color: #333; font-size: 0.9em; }
         
-        .action-btn 
-        {
-            background-color: #2c3e50; color: white; border: none; padding: 6px 12px;
-            border-radius: 4px; font-size: 1em; cursor: pointer;
-        }
+        .action-btn { background-color: #2c3e50; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 1em; cursor: pointer; }
+        .zone-select-btn { background-color: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1.1em; min-width: 120px; white-space: nowrap; text-align: center; }
+        .btn-reset { background-color: #7f8c8d; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
+        .edit-toggle-label { display: flex; align-items: center; font-size: 0.9em; color: #c0392b; font-weight: bold; border: 1px solid #c0392b; padding: 4px 8px; border-radius: 4px; background: #fff; }
 
-        .zone-select-btn 
-        {
-            background-color: #27ae60; color: white; border: none; padding: 6px 12px;
-            border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1.1em;
-            min-width: 120px; white-space: nowrap; text-align: center;
-        }
-
-        .btn-reset 
-        {
-            background-color: #7f8c8d; color: white; border: none; padding: 6px 10px;
-            border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold;
-        }
-
-        .edit-toggle-label 
-        {
-            display: flex; align-items: center; font-size: 0.9em; color: #c0392b;
-            font-weight: bold; border: 1px solid #c0392b; padding: 4px 8px;
-            border-radius: 4px; background: #fff;
-        }
-
-        /* =========================================
-           2. 表格樣式
-           ========================================= */
-        .card-container 
-        {
-            max-width: 100%; margin: 0 auto 15px auto; background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px;
-            overflow: hidden; overflow-x: auto; 
-        }
-
-        .zone-header 
-        {
-            background-color: #27ae60; color: white; padding: 8px 12px;
-            font-size: 1.3em; font-weight: bold; display: flex; gap: 10px;
-        }
-
+        /* 表格容器 */
+        .card-container { max-width: 100%; margin: 0 auto 15px auto; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; overflow-x: auto; }
+        .zone-header { background-color: #27ae60; color: white; padding: 8px 12px; font-size: 1.3em; font-weight: bold; display: flex; gap: 10px; }
         table { width: 100%; border-collapse: collapse; text-align: center; min-width: 800px; }
         th, td { border: 1px solid #ddd; padding: 2px 1px; background: #fff; }
         thead th { background: #7f8c8d; color: white; }
-        
+
+        /* 左側資訊與底色規則 */
         .col-combined-header { width: 50px; background: #546e7a !important; color: white; font-size: 0.9em; }
         .col-combined-cell { border-right: 2px solid #ccc; padding: 2px !important; cursor: pointer; }
-        .col-combined-cell div { line-height: 1.1; }
-        
         .hole-val { font-size: 1.1em; font-weight: bold; }
-        .hdcp-val { font-family: "Segoe UI Emoji", sans-serif; font-size: 1.0em; font-weight: 900; color: #000; opacity: 0.8; }
-        
-        .bg-par-3 .hdcp-val { color: #b71c1c; } 
-        .bg-par-5 .hdcp-val { color: #01579b; }
+        .hdcp-val { font-family: "Segoe UI Emoji", sans-serif; font-size: 1.0em; font-weight: 900; opacity: 0.9; }
 
-        /* =========================================
-           3. 動畫與高亮特效
-           ========================================= */
-        @keyframes blink-red 
-        { 
-            0% { color: red; opacity: 1; } 50% { color: red; opacity: 0.3; } 100% { color: red; opacity: 1; } 
-        }
-        
-        .cell-content.editing .hole-val, 
-        .cell-content.editing .hdcp-val { color: red !important; animation: blink-red 1s infinite; }
-        
-        tr.active-editing-row td 
-        {
-            background-color: #fff59d !important;
-            border-top: 2px solid #fbc02d;
-            border-bottom: 2px solid #fbc02d;
-        }
+        /* 底色規則 */
+        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; } /* 紅色底 */
+        .bg-par-3 .hole-val, .bg-par-3 .hdcp-val { color: #b71c1c; }
+        .bg-par-4 { background-color: #ffffff !important; color: #333; } /* 白色底 */
+        .bg-par-4 .hole-val, .bg-par-4 .hdcp-val { color: #333; }
+        .bg-par-5 { background-color: #bbdefb !important; color: #0d47a1; } /* 藍色底 */
+        .bg-par-5 .hole-val, .bg-par-5 .hdcp-val { color: #0d47a1; }
 
-        .score-btn.locked-btn { opacity: 0.6; cursor: not-allowed; background-color: #eee; }
+        @keyframes blink-red { 0% { color: red; opacity: 1; } 50% { color: red; opacity: 0.3; } 100% { color: red; opacity: 1; } }
+        .editing-text { color: red !important; animation: blink-red 1s infinite; }
+        .active-editing-row td { background-color: #fff59d !important; border-top: 2px solid #fbc02d; border-bottom: 2px solid #fbc02d; color: #000; }
 
-        /* =========================================
-           4. 分數顯示樣式
-           ========================================= */
-        .score-btn 
-        { 
-            width: 32px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 4px; 
-            cursor: pointer; margin-bottom: 2px; transition: all 0.1s; background-color: #fff; 
-            border: 1px dashed #ccc; color: #ccc; -webkit-user-select: none; padding: 0; 
-        }
-        .score-btn:active { transform: scale(0.95); }
-        
-        .score-btn.style-par { background: #ffcc80; border: 1px solid #ef6c00; color: #000; }
-        .score-btn.style-bogey { border: 2px solid #000; color: #000; }
-        .score-btn.style-double-bogey { border: 2px solid #000; color: #000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
-        .score-btn.style-birdie { border: 2px solid red; color: red; border-radius: 50%; }
-        .score-btn.style-eagle { border: 2px solid red; color: red; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
-
-        /* =========================================
-           5. 玩家與功能按鈕
-           ========================================= */
-        .player-header { min-width: 90px; }
-
-        .player-name-btn 
-        { 
-            background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; 
-            cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; 
-            min-height: 28px; overflow: hidden; text-overflow: ellipsis; 
-        }
+        /* ★ 修正：玩家欄位寬度固定 90px */
+        .player-header { min-width: 90px; width: 90px; max-width: 90px; }
+        .player-name-btn { background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; min-height: 28px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
-        .player-name-btn.locked { pointer-events: none; }
+        .clickable-name { border: 1px dashed rgba(255,255,255,0.5); background: rgba(0,0,0,0.1); } 
 
         .info-row { display: flex; justify-content: center; align-items: center; gap: 1px; margin-bottom: 2px; }
         .handicap-btn { display: inline-block; background-color: #e8f4f8; border: 1px solid #b3d7ff; color: #0056b3; padding: 0 2px; border-radius: 6px; cursor: pointer; height: 20px; line-height: 18px; font-size: 0.8em; min-width: 30px; }
         .host-btn { display: inline-block; background-color: #fff3e0; border: 1px solid #ffe0b2; color: #ef6c00; padding: 0 2px; border-radius: 6px; height: 20px; line-height: 18px; font-size: 0.8em; cursor: default; }
-        
+
         .stats-container { display: flex; justify-content: center; gap: 1px; margin-top: 2px; padding-top: 2px; border-top: 1px dashed rgba(255,255,255,0.3); }
         .stats-btn { width: 24px; height: 20px; font-size: 11px; font-weight: bold; border-radius: 3px; border: 1px solid #bdc3c7; background: #fff; display: flex; align-items: center; justify-content: center; cursor: default; color: #333; }
         .stats-ba { color: #e74c3c; border-color: #e74c3c; }
@@ -154,1155 +63,630 @@
         .stats-bb.negative { color: red; background-color: #ffebee; }
         .stats-bb.positive { color: blue; background-color: #e3f2fd; }
 
+        .score-btn { width: 32px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 2px; transition: all 0.1s; background-color: #fff; border: 1px dashed #ccc; color: #ccc; -webkit-user-select: none; padding: 0; }
+        .score-btn:active { transform: scale(0.95); }
+        
+        .style-par { background: #ffcc80; border: 1px solid #ef6c00; color: #000; }
+        .style-bogey { border: 2px solid #000; color: #000; }
+        .style-double-bogey { border: 2px solid #000; color: #000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #000; }
+        .style-birdie { border: 2px solid red; color: red; border-radius: 50%; }
+        .style-eagle { border: 2px solid red; color: red; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
+
         .sub-btn-container { display: flex; justify-content: center; gap: 1px; height: 22px; }
         .btn-ba, .btn-bb { width: 15px; height: 22px; background: #fff; border: 1px solid #ccc; border-radius: 3px; font-weight: bold; font-size: 9px; padding: 0; pointer-events: none; }
-        
         .btn-ba { color: #e74c3c; border: 1px solid #999; cursor: pointer; pointer-events: auto; }
-        .btn-ba.active-bg { background-color: #81c784 !important; border-color: #4caf50 !important; }
+        .active-ba-bg { background-color: #81c784 !important; border-color: #4caf50 !important; }
         
-        .btn-bb { background: #f9f9f9; color: blue; } .btn-bb.lose { color: red; }
+        .btn-bb { background: #f9f9f9; color: blue; } 
+        .btn-bb.lose { color: red; }
         .btn-bb.handicap-applied { background-color: #ffe0e0 !important; border-color: #ffcccc !important; }
 
-        /* =========================================
-           6. 總桿與 PK 樣式
-           ========================================= */
-        tr.total-row td 
-        {
-            background-color: #34495e !important; color: white; font-weight: bold;
-            border-top: 2px solid #2c3e50; padding: 4px; vertical-align: middle;
-        }
-        .total-label { font-size: 0.9em; line-height: 1.4; }
-        .total-display-container { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
-        .val-sub { font-size: 1.2em; color: #f1c40f; margin-bottom: 2px; } 
-        .val-grand { font-size: 0.9em; color: #fff; border-top: 1px solid rgba(255,255,255,0.3); width: 80%; } 
+        tr.total-row td { background-color: #34495e !important; color: white; font-weight: bold; border-top: 2px solid #2c3e50; padding: 4px; vertical-align: middle; }
+        .val-sub { font-size: 1.2em; color: #f1c40f; display:block; margin-bottom: 2px; line-height:1.1;} 
+        .val-grand { font-size: 0.9em; color: #fff; border-top: 1px solid rgba(255,255,255,0.3); display:block; width: 80%; margin:0 auto; line-height:1.1;} 
 
         .pk-header { background: #e67e22; color: white; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 1.2em; font-weight: bold; }
         .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
         .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
-        .pk-result-cell { font-size: 1.1em; font-weight: bold; color: #2980b9; }
-        .pk-result-cell.win { color: blue; background: #e3f2fd; }
-        .pk-result-cell.lose { color: red; background: #ffebee; }
         
-        .pk-name-btn 
-        { 
-            background: #f39c12; color: white; border: none; padding: 4px 4px; border-radius: 4px; 
-            font-size: 1.0em; font-weight: bold; cursor: pointer; 
-            width: auto; min-width: 50px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-        }
+        /* ★ 修正：PK 玩家按鈕寬度固定 120px */
+        .pk-name-btn { background: #f39c12; color: white; border: none; padding: 4px 4px; border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; width: 120px; min-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
         .pk-status { font-size: 0.9em; font-weight: bold; margin-top: 2px; }
         .pk-status.win { color: blue; } .pk-status.lose { color: red; }
 
-        /* =========================================
-           7. 底部輸入框
-           ========================================= */
         .custom-player-area { background: #fff; padding: 10px; margin: 10px auto; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .custom-player-title { font-weight: bold; color: #555; margin-bottom: 5px; display: block; }
-        
         .custom-input-group { display: flex; gap: 6px; flex-wrap: wrap; }
         .custom-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 0 0 calc(50% - 3px); box-sizing: border-box; }
 
-        /* PAR 背景色 */
-        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; }
-        .bg-par-4 { background-color: #ffffff !important; color: #333; }
-        .bg-par-5 { background-color: #b3e5fc !important; color: #01579b; }
-        tr.active-row td { background-color: #fff9c4 !important; }
-        tr.active-row .bg-par-3 { background-color: #ffccbc !important; }
-        tr.active-row .bg-par-4 { background-color: #fff9c4 !important; }
-        tr.active-row .bg-par-5 { background-color: #b2ebf2 !important; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .modal-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
-        .modal-title { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
         .modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .modal-btn { padding: 10px; border: none; border-radius: 5px; font-size: 1em; cursor: pointer; }
-        .btn-keep { background: #2980b9; color: white; }
-        .btn-clear { background: #e67e22; color: white; }
-        .btn-cancel { background: #95a5a6; color: white; }
     </style>
 </head>
 <body>
 
-<div class="main-controls">
-    <div class="control-group">
-        <span class="label-text">球場:</span>
-        <button id="course-selector" class="action-btn" onclick="toggleCourse()">台中國際</button>
-    </div>
-    
-    <label class="edit-toggle-label">
-        <input type="checkbox" id="edit-player-check" style="margin-right:4px;"> 編輯玩家
-    </label>
+<div id="app">
 
-    <button class="btn-reset" onclick="resetAllData()">⚠️ 清除 v53</button>
+    <div class="main-controls">
+        <div class="control-group">
+            <span class="label-text">球場:</span>
+            <button class="action-btn" @click="toggleCourse">{{ currentCourseName }}</button>
+        </div>
+        
+        <label class="edit-toggle-label">
+            <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
+        </label>
 
-    <div class="control-group" style="margin-left:5px;">
-        <span class="label-text">前 9 :</span>
-        <button id="zone-select-btn-1" class="zone-select-btn" onclick="tryToggleZone(1)">東區</button>
-    </div>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v58</button>
 
-    <div class="control-group">
-        <span class="label-text">後 9 :</span>
-        <button id="zone-select-btn-2" class="zone-select-btn" onclick="tryToggleZone(2)">西區</button>
-    </div>
-</div>
+        <div class="control-group" style="margin-left:5px;">
+            <span class="label-text">前 9 :</span>
+            <button class="zone-select-btn" @click="tryToggleZone('z1')">{{ currentZone1 }}</button>
+        </div>
 
-<div class="card-container">
-    <div class="zone-header"><span id="zone-label-1">前 9</span></div>
-    <table><thead><tr id="header-1"></tr></thead><tbody id="body-1"></tbody></table>
-</div>
-
-<div class="card-container">
-    <div class="zone-header"><span id="zone-label-2">後 9</span></div>
-    <table><thead><tr id="header-2"></tr></thead><tbody id="body-2"></tbody></table>
-</div>
-
-<div class="card-container" style="border: 2px solid #e67e22;">
-    <div class="pk-header"><span>⚔️ PK 專區</span></div>
-    <table id="pk-table">
-        <thead><tr id="pk-header-row-f9"></tr></thead>
-        <tbody>
-            <tr id="pk-row-p1-f9"></tr>
-            <tr id="pk-row-p2-f9"></tr>
-            <tr id="pk-header-row-b9" style="border-top: 3px solid #e67e22;"></tr>
-            <tr id="pk-row-p1-b9"></tr>
-            <tr id="pk-row-p2-b9"></tr>
-        </tbody>
-    </table>
-</div>
-
-<div class="custom-player-area">
-    <span style="font-weight:bold; color:#555; display:block; margin-bottom:5px;">非定義玩家 (輸入後自動加入名單)</span>
-    <div class="custom-input-group">
-        <input type="text" class="custom-input" id="custom-p1" placeholder="玩家 A" onchange="updateCustomPlayers()">
-        <input type="text" class="custom-input" id="custom-p2" placeholder="玩家 B" onchange="updateCustomPlayers()">
-        <input type="text" class="custom-input" id="custom-p3" placeholder="玩家 C" onchange="updateCustomPlayers()">
-        <input type="text" class="custom-input" id="custom-p4" placeholder="玩家 D" onchange="updateCustomPlayers()">
-    </div>
-</div>
-
-<div id="zone-modal" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-title">⚠️ 該球道已有資料</div>
-        <div class="modal-desc">切換球道？</div>
-        <div class="modal-buttons">
-            <button class="modal-btn btn-keep" onclick="handleZoneModal(1)">保留資料</button>
-            <button class="modal-btn btn-clear" onclick="handleZoneModal(2)">清除資料</button>
-            <button class="modal-btn btn-cancel" onclick="handleZoneModal(3)">取消</button>
+        <div class="control-group">
+            <span class="label-text">後 9 :</span>
+            <button class="zone-select-btn" @click="tryToggleZone('z2')">{{ currentZone2 }}</button>
         </div>
     </div>
+
+    <div class="card-container" v-for="zKey in ['z1', 'z2']" :key="zKey">
+        <div class="zone-header">
+            {{ zKey === 'z1' ? '前 9' : '後 9' }}: {{ getZoneName(zKey) }}
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-combined-header">Hole<br><span style="font-size:0.8em; opacity:0.8;">HDCP</span></th>
+                    <th v-for="colIdx in 12" :key="colIdx-1" class="player-header">
+                        <button class="player-name-btn" 
+                                :class="{ 'clickable-name': isEditMode }"
+                                @click="cyclePlayerName(colIdx-1)">
+                            {{ columnNames[colIdx-1] || '...' }}
+                        </button>
+                        <div class="info-row">
+                            <div v-if="colIdx === 1" class="host-btn">爐主</div>
+                            <div v-else class="handicap-btn" @click="toggleHandicap(colIdx-1, zKey)">讓 {{ handicaps[zKey][colIdx-1] }}</div>
+                        </div>
+                        <div class="stats-container">
+                            <div class="stats-btn stats-ba" style="color:#e74c3c;">{{ countBA(colIdx-1, zKey) }}</div>
+                            <div class="stats-btn stats-bb" 
+                                 :class="{'positive': countBB(colIdx-1, zKey)>0, 'negative': countBB(colIdx-1, zKey)<0}">
+                                {{ countBB(colIdx-1, zKey) > 0 ? '+' + countBB(colIdx-1, zKey) : countBB(colIdx-1, zKey) }}
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(hole, rIdx) in getZoneData(zKey).holes" :key="rIdx"
+                    :class="{ 'active-editing-row': activeEditingRow?.zKey === zKey && activeEditingRow?.rIdx === rIdx }">
+                    
+                    <td class="col-combined-cell" 
+                        :class="getParBgClass(getZoneData(zKey).par[rIdx])"
+                        @click="handleHoleClick(zKey, rIdx)">
+                        <div class="cell-content">
+                            <div class="hole-val" :class="{ 'editing-text': isRowEditing(zKey, rIdx) }">{{ hole }}</div>
+                            <div class="hdcp-val" :class="{ 'editing-text': isRowEditing(zKey, rIdx) }">
+                                ⛳ {{ getZoneData(zKey).hdcp[rIdx] }}
+                            </div>
+                        </div>
+                    </td>
+
+                    <td v-for="colIdx in 12" :key="colIdx-1">
+                        <button class="score-btn" 
+                                :class="[getScoreClass(scores[zKey][rIdx][colIdx-1], getZoneData(zKey).par[rIdx]), { 'locked-btn': !isRowEditing(zKey, rIdx) }]"
+                                @click.stop="updateScore(zKey, rIdx, colIdx-1)">
+                            {{ scores[zKey][rIdx][colIdx-1] }}
+                        </button>
+                        <div class="sub-btn-container">
+                            <button class="btn-ba" 
+                                    :class="{ 'active-ba-bg': baSelections[zKey][rIdx] !== null }"
+                                    @click="toggleBA(zKey, rIdx, colIdx-1)">
+                                {{ baSelections[zKey][rIdx] === (colIdx-1) ? 'O' : '' }}
+                            </button>
+                            <button v-if="colIdx > 1" class="btn-bb" 
+                                    :class="getBBClass(zKey, rIdx, colIdx-1)">
+                                {{ calculateBB(zKey, rIdx, colIdx-1).text }}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="total-row">
+                    <td>{{ zKey === 'z1' ? '前 9' : '後 9' }}<br>總桿</td>
+                    <td v-for="colIdx in 12" :key="colIdx-1">
+                        <div class="total-display-container">
+                            <span class="val-sub">{{ calculateGross(zKey, colIdx-1) }}</span>
+                            <span class="val-grand">{{ calculateGrandTotal(colIdx-1) }}</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-container" style="border: 2px solid #e67e22;">
+        <div class="pk-header"><span>⚔️ PK 專區</span></div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="min-width:60px;">前 9</th>
+                    <th v-for="(hole, i) in getZoneData('z1').holes" :key="i" class="pk-hole-header" :class="getParBgClass(getZoneData('z1').par[i])">{{ hole }}</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button class="pk-name-btn" @click="togglePkPlayer(1)">{{ pk.p1 }}</button>
+                        <div class="host-btn" style="margin-top:2px; font-size:0.8em;">爐主</div>
+                        <div class="pk-status" :class="pkResults.f9.p1Cls">{{ pkResults.f9.p1Txt }}</div>
+                    </td>
+                    <td v-for="(val, i) in pkResults.f9.scores.p1" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z1').par[i])">{{ val }}</td>
+                    <td style="font-weight:bold;">{{ pkResults.f9.totals.p1 || '' }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="pk-name-btn" @click="togglePkPlayer(2)">{{ pk.p2 }}</button>
+                        <div class="handicap-btn" style="margin-top:2px; font-size:0.8em;" @click="togglePkHdcp('f9')">讓 {{ pk.hdcp_f9 }}</div>
+                        <div class="pk-status" :class="pkResults.f9.p2Cls">{{ pkResults.f9.p2Txt }}</div>
+                    </td>
+                    <td v-for="(val, i) in pkResults.f9.scores.p2" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z1').par[i])">{{ val }}</td>
+                    <td style="font-weight:bold;">{{ pkResults.f9.totals.p2 || '' }}</td>
+                </tr>
+            </tbody>
+            <thead style="border-top: 3px solid #e67e22;">
+                <tr>
+                    <th>後 9</th>
+                    <th v-for="(hole, i) in getZoneData('z2').holes" :key="i" class="pk-hole-header" :class="getParBgClass(getZoneData('z2').par[i])">{{ hole }}</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span style="font-weight:bold;">{{ pk.p1 }}</span><div class="pk-status" :class="pkResults.b9.p1Cls">{{ pkResults.b9.p1Txt }}</div></td>
+                    <td v-for="(val, i) in pkResults.b9.scores.p1" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z2').par[i])">{{ val }}</td>
+                    <td style="font-weight:bold;">{{ pkResults.b9.totals.p1 || '' }}</td>
+                </tr>
+                <tr>
+                    <td><span style="font-weight:bold;">{{ pk.p2 }}</span><div class="handicap-btn" style="margin-top:2px; font-size:0.8em;" @click="togglePkHdcp('b9')">讓 {{ pk.hdcp_b9 }}</div><div class="pk-status" :class="pkResults.b9.p2Cls">{{ pkResults.b9.p2Txt }}</div></td>
+                    <td v-for="(val, i) in pkResults.b9.scores.p2" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z2').par[i])">{{ val }}</td>
+                    <td style="font-weight:bold;">{{ pkResults.b9.totals.p2 || '' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="custom-player-area">
+        <span style="font-weight:bold; color:#555; display:block; margin-bottom:5px;">非定義玩家 (輸入後自動加入名單)</span>
+        <div class="custom-input-group">
+            <input v-for="(name, idx) in customPlayers" :key="idx" type="text" class="custom-input" 
+                   v-model="customPlayers[idx]" :placeholder="'玩家 ' + String.fromCharCode(65+idx)">
+        </div>
+    </div>
+
+    <div v-if="showZoneModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">⚠️ 該球道已有資料</div>
+            <div class="modal-buttons">
+                <button class="modal-btn" style="background:#2980b9; color:white;" @click="confirmZoneChange(false)">保留資料</button>
+                <button class="modal-btn" style="background:#e67e22; color:white;" @click="confirmZoneChange(true)">清除資料</button>
+                <button class="modal-btn" style="background:#95a5a6; color:white;" @click="showZoneModal = false">取消</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-// ============================================
-//  1. 資料定義 (包含新球場資料)
-// ============================================
-const STORAGE_KEY = 'golf_scorecard_v53_version_display'; 
+    const { createApp, reactive, computed, watch, onMounted, toRefs } = Vue;
 
-const basePlayerNames = [
-    "張簡榮力", "洪忠宜", "陳振峯", "趙振明", 
-    "李子瑋", "張嘉原", "巫吉生", "吳建輝",
-    "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"
-];
-
-let customPlayers = ["", "", "", ""]; 
-let allPlayerNames = [...basePlayerNames]; 
-
-const COURSE_DATA = {
-    "台中國際": {
-        zones: {
-            "東區": { holes: ["東1", "東2", "東3", "東4", "東5", "東6", "東7", "東8", "東9"], par: [4, 4, 3, 5, 4, 4, 3, 5, 4], hdcp: [2, 8, 5, 4, 7, 1, 9, 3, 6] },
-            "中區": { holes: ["中1", "中2", "中3", "中4", "中5", "中6", "中7", "中8", "中9"], par: [4, 4, 3, 5, 4, 4, 3, 4, 5], hdcp: [7, 2, 8, 5, 4, 1, 9, 3, 6] },
-            "西區": { holes: ["西1", "西2", "西3", "西4", "西5", "西6", "西7", "西8", "西9"], par: [5, 4, 3, 4, 4, 3, 4, 5, 4], hdcp: [3, 6, 9, 8, 1, 4, 7, 2, 5] }
-        }
-    },
-    "豐原球場": {
-        zones: {
-            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 5, 5, 3, 4, 4, 3, 4, 3], hdcp: [5, 3, 7, 15, 1, 9, 17, 11, 13] },
-            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 3, 4, 3, 5, 4, 5], hdcp: [4, 18, 2, 16, 10, 14, 12, 6, 8] }
-        }
-    },
-    "彰化球場": {
-        zones: {
-            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [5, 3, 4, 4, 4, 5, 4, 4, 3], hdcp: [3, 17, 1, 11, 7, 13, 9, 5, 15] },
-            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 4, 4, 4, 3, 5, 5], hdcp: [4, 16, 2, 18, 6, 8, 14, 10, 12] }
-        }
-    },
-    "清泉崗球場": {
-        zones: {
-            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 4, 4, 3, 4, 4, 5, 4, 4], hdcp: [11, 1, 5, 9, 3, 15, 7, 13, 17] },
-            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [4, 3, 4, 5, 4, 4, 5, 3, 4], hdcp: [4, 12, 16, 8, 10, 2, 6, 18, 14] }
-        }
-    },
-    "全國球場": {
-        zones: {
-            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [4, 4, 5, 4, 3, 4, 5, 3, 4], hdcp: [17, 11, 9, 5, 13, 1, 3, 15, 7] },
-            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [4, 3, 4, 5, 3, 4, 5, 4, 4], hdcp: [18, 16, 12, 10, 14, 2, 4, 6, 8] }
-        }
-    },
-    "南峰球場": {
-        zones: {
-            "OUT": { holes: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], par: [5, 4, 4, 3, 4, 4, 3, 5, 4], hdcp: [3, 9, 15, 13, 5, 1, 17, 11, 7] },
-            "IN": { holes: ["10", "11", "12", "13", "14", "15", "16", "17", "18"], par: [5, 3, 4, 4, 3, 4, 5, 4, 4], hdcp: [4, 18, 10, 6, 14, 2, 8, 12, 16] }
-        }
-    }
-};
-
-let lastBaClickTime = 0;
-let pendingZoneChange = null;
-let currentCourseName = "台中國際";
-let currentZone1 = "東區"; 
-let currentZone2 = "西區";
-
-// 記錄當前正在編輯的行 (Row Index)，用於控制閃爍和高亮
-let activeEditingRow = null; 
-
-// PK 設定變數
-let pk_p1_name = basePlayerNames[0];
-let pk_p2_name = basePlayerNames[1];
-let pk_p2_hdcp_f9 = 4; 
-let pk_p2_hdcp_b9 = 4; 
-
-// ============================================
-//  2. 狀態校正與玩家更新
-// ============================================
-
-// ★ 防呆機制：防止切換球場時，因找不到區域而當機
-function validateState() 
-{
-    if (!COURSE_DATA[currentCourseName]) 
-    {
-        currentCourseName = "台中國際";
-    }
-    const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
-    // 如果目前的區域名稱不存在於目前的球場，強制重置為前兩個區域
-    if (!zones.includes(currentZone1)) currentZone1 = zones[0];
-    if (!zones.includes(currentZone2)) currentZone2 = zones.length > 1 ? zones[1] : zones[0];
-}
-
-// 讀取底部輸入框，更新玩家列表
-function updateCustomPlayers() 
-{
-    customPlayers = [
-        document.getElementById('custom-p1').value.trim(),
-        document.getElementById('custom-p2').value.trim(),
-        document.getElementById('custom-p3').value.trim(),
-        document.getElementById('custom-p4').value.trim()
-    ];
-    let extras = customPlayers.filter(n => n !== "");
-    allPlayerNames = [...basePlayerNames, ...extras];
-    renderAll();
-    saveData();
-}
-
-// ============================================
-//  3. 球場與球道切換邏輯
-// ============================================
-
-function toggleCourse() 
-{
-    const courses = Object.keys(COURSE_DATA);
-    let idx = courses.indexOf(currentCourseName);
-    currentCourseName = courses[(idx + 1) % courses.length];
-    
-    // ★ 切換球場時，強制重置區域，防止當機
-    const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
-    currentZone1 = zones[0];
-    currentZone2 = zones.length > 1 ? zones[1] : zones[0];
-    
-    renderAll();
-    saveData();
-}
-
-function tryToggleZone(tableId) 
-{
-    validateState(); 
-    const zones = Object.keys(COURSE_DATA[currentCourseName].zones);
-    let currentZone = (tableId === 1) ? currentZone1 : currentZone2;
-    let idx = zones.indexOf(currentZone);
-    let nextZone = zones[(idx + 1) % zones.length];
-
-    // 如果表格有資料，跳出確認視窗，避免誤刪
-    if (hasDataInTable(tableId)) 
-    {
-        pendingZoneChange = { tableId: tableId, nextZone: nextZone };
-        document.getElementById('zone-modal').style.display = 'flex';
-    } 
-    else 
-    {
-        applyZoneChange(tableId, nextZone, false);
-    }
-}
-
-function hasDataInTable(tableId) 
-{
-    for (let r = 0; r < 9; r++) 
-    {
-        for (let p = 1; p <= allPlayerNames.length; p++) 
-        {
-            let scoreBtn = document.getElementById(`table${tableId}-row${r}-p${p}-score`);
-            if (scoreBtn && scoreBtn.innerText !== "") return true;
-        }
-    }
-    return false;
-}
-
-function applyZoneChange(tableId, nextZone, shouldClear) 
-{
-    if (tableId === 1) currentZone1 = nextZone;
-    else currentZone2 = nextZone;
-
-    // 先切換區域重畫
-    renderAll(); 
-
-    // ★ 如果使用者選擇「清除」，則強制清空該表格
-    if (shouldClear) 
-    {
-        clearTableData(tableId);
-    }
-    
-    saveData();
-    document.getElementById('zone-modal').style.display = 'none';
-    pendingZoneChange = null;
-}
-
-function clearTableData(tableId) 
-{
-    for (let r = 0; r < 9; r++) 
-    {
-        for (let p = 1; p <= allPlayerNames.length; p++) 
-        {
-            let sBtn = document.getElementById(`table${tableId}-row${r}-p${p}-score`);
-            if (sBtn) { sBtn.innerText = ""; sBtn.className = "score-btn locked-btn"; }
+    createApp({
+        setup() {
+            const STORAGE_KEY = 'golf_scorecard_v58_12players';
+            const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
-            let baBtn = document.getElementById(`table${tableId}-row${r}-p${p}-ba`);
-            if (baBtn) { baBtn.innerText = ""; baBtn.className = "btn-ba"; baBtn.style.backgroundColor = '#fff'; }
-        }
-    }
-    activeEditingRow = null;
-    updateRowLockVisuals();
-    updateAllBBCalculations(); 
-}
-
-// ============================================
-//  4. 表格操作 (點擊洞號、輸入分數、點名、BA)
-// ============================================
-
-// 點擊洞號：進入編輯模式 + 自動填入 PAR (若該洞全空)
-function handleHoleClick(tableId, rowIdx) 
-{
-    if (activeEditingRow && activeEditingRow.tableId === tableId && activeEditingRow.rowIdx === rowIdx) 
-    {
-        activeEditingRow = null;
-    } 
-    else 
-    {
-        activeEditingRow = { tableId: tableId, rowIdx: rowIdx };
-
-        // ★ 自動填 PAR 邏輯
-        const zName = (tableId === 1) ? currentZone1 : currentZone2;
-        const zData = COURSE_DATA[currentCourseName].zones[zName];
-        if(zData)
-        {
-            const par = zData.par[rowIdx];
-            let allEmpty = true;
-            
-            for(let i=0; i<allPlayerNames.length; i++)
-            {
-                let pNum = i + 1;
-                let nameBtn = document.getElementById(`table${tableId}-p${pNum}-name`);
-                if(!nameBtn || nameBtn.innerText.trim() === "") continue;
-
-                let sBtn = document.getElementById(`table${tableId}-row${rowIdx}-p${pNum}-score`);
-                if(sBtn && sBtn.innerText !== "")
-                {
-                    allEmpty = false;
-                    break;
-                }
-            }
-
-            if(allEmpty)
-            {
-                for(let i=0; i<allPlayerNames.length; i++)
-                {
-                    let pNum = i + 1;
-                    let nameBtn = document.getElementById(`table${tableId}-p${pNum}-name`);
-                    if(!nameBtn || nameBtn.innerText.trim() === "") continue;
-
-                    let sBtn = document.getElementById(`table${tableId}-row${rowIdx}-p${pNum}-score`);
-                    if(sBtn)
-                    {
-                        sBtn.innerText = par;
-                        updateScoreVisual(sBtn, par, par);
-                    }
-                }
-                updateAllBBCalculations();
-                saveData();
-            }
-        }
-    }
-    updateRowLockVisuals();
-}
-
-// 更新畫面鎖定狀態 (整列亮黃色 + 洞號閃爍)
-function updateRowLockVisuals() 
-{
-    document.querySelectorAll('.cell-content').forEach(el => el.classList.remove('editing'));
-    document.querySelectorAll('.score-btn').forEach(el => el.classList.add('locked-btn')); 
-    document.querySelectorAll('.btn-ba').forEach(el => el.style.pointerEvents = 'none'); 
-    document.querySelectorAll('tr').forEach(tr => tr.classList.remove('active-editing-row'));
-
-    if (activeEditingRow) 
-    {
-        const table = document.getElementById(`body-${activeEditingRow.tableId}`);
-        if(table && table.children[activeEditingRow.rowIdx]) 
-        {
-            const tr = table.children[activeEditingRow.rowIdx];
-            tr.classList.add('active-editing-row'); 
-
-            const holeCell = tr.querySelector('.cell-content');
-            if(holeCell) holeCell.classList.add('editing'); 
-            
-            tr.querySelectorAll('.score-btn').forEach(btn => btn.classList.remove('locked-btn'));
-            tr.querySelectorAll('.btn-ba').forEach(btn => btn.style.pointerEvents = 'auto');
-        }
-    }
-}
-
-// 點擊玩家名字：切換下一位
-function handleNameClick(btn) 
-{
-    if(!document.getElementById('edit-player-check').checked) return;
-    let parts = btn.id.split('-');
-    let pIdx = parseInt(parts[1].replace('p',''));
-    let currentName = btn.innerText;
-    let nextName = "";
-    
-    if(currentName === "") 
-    {
-        nextName = allPlayerNames[0];
-    } 
-    else 
-    {
-        let currIdx = allPlayerNames.indexOf(currentName);
-        if(currIdx === -1 || currIdx === allPlayerNames.length - 1) 
-        {
-            nextName = ""; 
-        } 
-        else 
-        {
-            nextName = allPlayerNames[currIdx + 1];
-        }
-    }
-    
-    let t1 = document.getElementById(`table1-p${pIdx}-name`);
-    let t2 = document.getElementById(`table2-p${pIdx}-name`);
-    if(t1) t1.innerText = nextName;
-    if(t2) t2.innerText = nextName;
-
-    saveData();
-    renderPkTable();
-}
-
-// 點擊分數：循環 1 -> 9 -> 空白
-function handleScoreClick(btn, par) 
-{
-    if(btn.classList.contains('locked-btn')) return;
-
-    let parts = btn.id.split('-'); 
-    let tId = parseInt(parts[0].replace('table',''));
-    let rIdx = parseInt(parts[1].replace('row',''));
-    let pIdx = parseInt(parts[2].replace('p',''));
-    
-    let nameBtn = document.getElementById(`table${tId}-p${pIdx}-name`);
-    if (!nameBtn || nameBtn.innerText.trim() === "") return;
-
-    let text = btn.innerText;
-    let nextVal;
-    
-    if (text === "") 
-    {
-        nextVal = 1; 
-    } 
-    else 
-    {
-        let currentVal = parseInt(text);
-        let maxLimit = 9; 
-        
-        if (currentVal >= maxLimit) 
-        {
-            nextVal = ""; 
-        } 
-        else 
-        {
-            nextVal = currentVal + 1;
-        }
-    }
-    
-    btn.innerText = nextVal;
-    
-    let scoreInt = (nextVal === "") ? NaN : nextVal;
-    updateScoreVisual(btn, scoreInt, par);
-    
-    updateAllBBCalculations();
-    saveData();
-}
-
-// 點擊 BA：整列變色
-function handleBAClick(tableId, rowIndex, playerIndex) 
-{
-    if (playerIndex >= 4) return; 
-    
-    const rowButtons = [];
-    for (let i = 0; i < 4; i++) 
-    {
-        rowButtons.push(document.getElementById(`table${tableId}-row${rowIndex}-p${i+1}-ba`));
-    }
-    const clickedBtn = rowButtons[playerIndex];
-    const isCurrentlyO = clickedBtn.innerText === "O";
-    
-    // 重置所有文字
-    rowButtons.forEach(btn => 
-    {
-        btn.innerText = "";
-    });
-    
-    let hasActiveO = false;
-    
-    if (!isCurrentlyO) 
-    {
-        clickedBtn.innerText = "O";
-        hasActiveO = true;
-    }
-    
-    // ★ 統一變色
-    rowButtons.forEach(btn => 
-    {
-        if (hasActiveO) 
-        {
-            btn.classList.add('active-bg');
-            btn.style.backgroundColor = '#81c784'; // Green
-        }
-        else 
-        {
-            btn.classList.remove('active-bg');
-            btn.style.backgroundColor = '#fff'; // White
-        }
-    });
-    
-    updateTotals();
-    saveData();
-}
-
-// 載入時恢復 BA 背景色
-function refreshBaBackgrounds(tableId) 
-{
-    for (let r = 0; r < 9; r++) 
-    {
-        let hasO = false;
-        const rowButtons = [];
-        for (let i = 0; i < 4; i++) 
-        {
-            let btn = document.getElementById(`table${tableId}-row${r}-p${i+1}-ba`);
-            if (btn) 
-            {
-                rowButtons.push(btn);
-                if (btn.innerText === "O") hasO = true;
-            }
-        }
-        rowButtons.forEach(btn => 
-        {
-            if (hasO) 
-            {
-                btn.classList.add('active-bg');
-                btn.style.backgroundColor = '#81c784';
-            }
-            else 
-            {
-                btn.classList.remove('active-bg');
-                btn.style.backgroundColor = '#fff';
-            }
-        });
-    }
-}
-
-function handleHdcpClick(btn) 
-{
-    let num = parseInt(btn.innerText.replace('讓 ', ''));
-    let next = (num + 1) > 9 ? 0 : num + 1;
-    btn.innerText = `讓 ${next}`;
-    updateAllBBCalculations();
-    saveData();
-}
-
-function updateScoreVisual(btn, scoreVal, parVal) 
-{
-    btn.classList.remove('style-par', 'style-bogey', 'style-double-bogey', 'style-birdie', 'style-eagle');
-    if (isNaN(scoreVal)) return;
-    const diff = scoreVal - parVal;
-    if (diff === 0) btn.classList.add('style-par');
-    else if (diff === 1) btn.classList.add('style-bogey');
-    else if (diff >= 2) btn.classList.add('style-double-bogey');
-    else if (diff === -1) btn.classList.add('style-birdie');
-    else if (diff <= -2) btn.classList.add('style-eagle');
-}
-
-// ============================================
-//  5. PK 專區邏輯
-// ============================================
-
-function togglePkPlayer(playerIdx) 
-{
-    let currentName = (playerIdx === 1) ? pk_p1_name : pk_p2_name;
-    let idx = allPlayerNames.indexOf(currentName);
-    if (idx === -1) idx = 0;
-    let nextIdx = (idx + 1) % allPlayerNames.length;
-    
-    if (playerIdx === 1) pk_p1_name = allPlayerNames[nextIdx];
-    else pk_p2_name = allPlayerNames[nextIdx];
-    
-    renderPkTable();
-    saveData();
-}
-
-function togglePkHdcp(zoneType) 
-{
-    if(zoneType === 'f9') 
-    {
-        if (pk_p2_hdcp_f9 >= 9) pk_p2_hdcp_f9 = 0;
-        else pk_p2_hdcp_f9++;
-    } 
-    else 
-    {
-        if (pk_p2_hdcp_b9 >= 9) pk_p2_hdcp_b9 = 0;
-        else pk_p2_hdcp_b9++;
-    }
-    renderPkTable();
-    saveData();
-}
-
-function renderPkTable() 
-{
-    validateState();
-    const z1Data = COURSE_DATA[currentCourseName].zones[currentZone1];
-    const z2Data = COURSE_DATA[currentCourseName].zones[currentZone2];
-
-    const renderHeader = (label, data) => 
-    {
-        let html = `<th style="min-width:60px;">${label}</th>`;
-        for(let i=0; i<9; i++) 
-        {
-            let par = data.par[i];
-            let bg = (par===3)?'bg-par-3':(par>=5?'bg-par-5':'bg-par-4');
-            html += `<th class="pk-hole-header ${bg}">${data.holes[i]}</th>`;
-        }
-        return html + `<th>Total</th>`;
-    };
-
-    document.getElementById('pk-header-row-f9').innerHTML = renderHeader("前 9", z1Data);
-    document.getElementById('pk-header-row-b9').innerHTML = renderHeader("後 9", z2Data);
-
-    let p1_idx = -1, p2_idx = -1;
-    for(let i=1; i<=allPlayerNames.length; i++) 
-    {
-        let btn = document.getElementById(`table1-p${i}-name`);
-        if(btn && btn.innerText === pk_p1_name) p1_idx = i;
-        let btn2 = document.getElementById(`table1-p${i}-name`);
-        if(btn2 && btn2.innerText === pk_p2_name) p2_idx = i;
-    }
-
-    const getScores = (tableId, count) => 
-    {
-        let arr = [];
-        for(let i=0; i<count; i++) 
-        {
-            let s1=null, s2=null;
-            if(p1_idx!==-1) 
-            {
-                let b = document.getElementById(`table${tableId}-row${i}-p${p1_idx}-score`);
-                if(b) s1 = parseInt(b.innerText);
-            }
-            if(p2_idx!==-1) 
-            {
-                let b = document.getElementById(`table${tableId}-row${i}-p${p2_idx}-score`);
-                if(b) s2 = parseInt(b.innerText);
-            }
-            arr.push({s1: isNaN(s1)?null:s1, s2: isNaN(s2)?null:s2});
-        }
-        return arr;
-    };
-
-    const f9_scores = getScores(1, 9);
-    const b9_scores = getScores(2, 9);
-
-    const calcStatus = (scores, pars, hdcps, p2_hdcp) => 
-    {
-        let netTotal = 0;
-        for(let i=0; i<9; i++) 
-        {
-            let s = scores[i];
-            if(s.s1 !== null && s.s2 !== null) 
-            {
-                let isHdcp = (hdcps[i] <= p2_hdcp);
-                let netS2 = s.s2 - (isHdcp ? 1 : 0);
-                if(netS2 < s.s1) netTotal += (s.s2 < pars[i] ? 2 : 1);
-                else if(netS2 > s.s1) netTotal -= (s.s1 < pars[i] ? 2 : 1);
-            }
-        }
-        let p1Txt="平手", p2Txt="平手", p1Cls="tie", p2Cls="tie";
-        if(netTotal > 0) 
-        {
-            p2Txt = `贏 ${netTotal} 洞`; p2Cls = "win";
-            p1Txt = `輸 ${netTotal} 洞`; p1Cls = "lose";
-        } 
-        else if(netTotal < 0) 
-        {
-            p1Txt = `贏 ${Math.abs(netTotal)} 洞`; p1Cls = "win";
-            p2Txt = `輸 ${Math.abs(netTotal)} 洞`; p2Cls = "lose";
-        }
-        return { p1Txt, p1Cls, p2Txt, p2Cls };
-    };
-
-    const f9_stat = calcStatus(f9_scores, z1Data.par, z1Data.hdcp, pk_p2_hdcp_f9);
-    const b9_stat = calcStatus(b9_scores, z2Data.par, z2Data.hdcp, pk_p2_hdcp_b9);
-
-    const renderRow = (name, isP1, scores, pars, stat, isFront) => 
-    {
-        let html = `<td>`;
-        if(isFront) 
-        {
-            html += `<button class="pk-name-btn" onclick="togglePkPlayer(${isP1?1:2})">${name}</button>`;
-            if(isP1) html += `<div class="host-btn" style="margin-top:2px;">爐主</div>`;
-            else html += `<div class="handicap-btn" style="margin-top:2px;" onclick="togglePkHdcp('f9')">讓 ${pk_p2_hdcp_f9}</div>`;
-        } 
-        else 
-        {
-            html += `<span style="font-weight:bold;">${name}</span>`;
-            if(!isP1) html += `<div class="handicap-btn" style="margin-top:2px;" onclick="togglePkHdcp('b9')">讓 ${pk_p2_hdcp_b9}</div>`;
-        }
-        
-        let statusTxt = isP1 ? stat.p1Txt : stat.p2Txt;
-        let statusCls = isP1 ? stat.p1Cls : stat.p2Cls;
-        html += `<div class="pk-status ${statusCls}">${statusTxt}</div></td>`;
-
-        let total = 0;
-        for(let i=0; i<9; i++) 
-        {
-            let val = isP1 ? scores[i].s1 : scores[i].s2;
-            let display = (val===null)?"":val;
-            let cls = "";
-            if(val!==null) 
-            {
-                total += val;
-                let diff = val - pars[i];
-                if(diff===0) cls="style-par";
-                else if(diff===1) cls="style-bogey";
-                else if(diff>=2) cls="style-double-bogey";
-                else if(diff===-1) cls="style-birdie";
-                else if(diff<=-2) cls="style-eagle";
-            }
-            html += `<td class="pk-score-cell ${cls}">${display}</td>`;
-        }
-        html += `<td style="font-weight:bold;">${total>0?total:''}</td>`;
-        return html;
-    };
-
-    document.getElementById('pk-row-p1-f9').innerHTML = renderRow(pk_p1_name, true, f9_scores, z1Data.par, f9_stat, true);
-    document.getElementById('pk-row-p2-f9').innerHTML = renderRow(pk_p2_name, false, f9_scores, z1Data.par, f9_stat, true);
-    document.getElementById('pk-row-p1-b9').innerHTML = renderRow(pk_p1_name, true, b9_scores, z2Data.par, b9_stat, false);
-    document.getElementById('pk-row-p2-b9').innerHTML = renderRow(pk_p2_name, false, b9_scores, z2Data.par, b9_stat, false);
-}
-
-// ============================================
-//  6. 總桿計算與 BB 顯示
-// ============================================
-
-function updateAllBBCalculations() 
-{
-    validateState();
-    [1, 2].forEach(tableId => 
-    {
-        const zName = (tableId === 1) ? currentZone1 : currentZone2;
-        const zData = COURSE_DATA[currentCourseName].zones[zName];
-        
-        // ★ 核心修正：將當前 9 洞的 HDCP 複製出來並排序
-        const sortedHdcpList = [...zData.hdcp].sort((a, b) => a - b);
-        
-        for(let r=0; r<9; r++) 
-        {
-            const par = zData.par[r];
-            const hdcp = zData.hdcp[r];
-            const p1Btn = document.getElementById(`table${tableId}-row${r}-p1-score`);
-            const s1 = parseInt(p1Btn.innerText);
-
-            for(let i=2; i<=allPlayerNames.length; i++) 
-            {
-                const sBtn = document.getElementById(`table${tableId}-row${r}-p${i}-score`);
-                if(!sBtn) break;
-                const sVal = parseInt(sBtn.innerText);
+            const state = reactive({
+                currentCourseName: "台中國際",
+                currentZone1: "東區",
+                currentZone2: "西區",
+                isEditMode: false,
+                customPlayers: ["", "", "", ""],
+                activeEditingRow: null,
+                showZoneModal: false,
+                pendingZoneChange: null,
                 
-                const hBtn = document.getElementById(`table${tableId}-hdcp-p${i}`);
-                let hSet = parseInt(hBtn.innerText.replace('讓 ',''));
+                // ★ 修正：scores 擴充至 12 欄
+                scores: {
+                    z1: Array(9).fill().map(() => Array(12).fill("")),
+                    z2: Array(9).fill().map(() => Array(12).fill(""))
+                },
                 
-                // ★ 計算讓桿門檻值：
-                // 例如讓 4 桿，我們就找 sortedHdcpList 第 4 個數值 (index 3)
-                // 任何 HDCP <= 這個數值的洞，都要讓桿
+                baSelections: {
+                    z1: Array(9).fill(null),
+                    z2: Array(9).fill(null)
+                },
+
+                // ★ 修正：讓桿獨立設定，且擴充至 12 人
+                handicaps: {
+                    z1: Array(12).fill(4),
+                    z2: Array(12).fill(4)
+                },
+
+                // ★ 新增：紀錄 12 個欄位目前顯示的玩家名稱 (可含空白)
+                // 預設前4個欄位填入前4位玩家，其餘空白
+                columnNames: Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : ""),
+
+                pk: { p1: basePlayers[0], p2: basePlayers[1], hdcp_f9: 4, hdcp_b9: 4 }
+            });
+
+            const courseDB = {
+                "台中國際": {
+                    "東區": { holes: ["東1","東2","東3","東4","東5","東6","東7","東8","東9"], par: [4,4,3,5,4,4,3,5,4], hdcp: [2,8,5,4,7,1,9,3,6] },
+                    "中區": { holes: ["中1","中2","中3","中4","中5","中6","中7","中8","中9"], par: [4,4,3,5,4,4,3,4,5], hdcp: [7,2,8,5,4,1,9,3,6] },
+                    "西區": { holes: ["西1","西2","西3","西4","西5","西6","西7","西8","西9"], par: [5,4,3,4,4,3,4,5,4], hdcp: [3,6,9,8,1,4,7,2,5] }
+                },
+                "豐原球場": {
+                    "OUT": { holes: ["1","2","3","4","5","6","7","8","9"], par: [4,5,5,3,4,4,3,4,3], hdcp: [5,3,7,15,1,9,17,11,13] },
+                    "IN": { holes: ["10","11","12","13","14","15","16","17","18"], par: [5,3,4,3,4,3,5,4,5], hdcp: [4,18,2,16,10,14,12,6,8] }
+                },
+                "彰化球場": {
+                    "OUT": { holes: ["1","2","3","4","5","6","7","8","9"], par: [5,3,4,4,4,5,4,4,3], hdcp: [3,17,1,11,7,13,9,5,15] },
+                    "IN": { holes: ["10","11","12","13","14","15","16","17","18"], par: [5,3,4,4,4,4,3,5,5], hdcp: [4,16,2,18,6,8,14,10,12] }
+                },
+                "清泉崗球場": {
+                    "OUT": { holes: ["1","2","3","4","5","6","7","8","9"], par: [4,4,4,3,4,4,5,4,4], hdcp: [11,1,5,9,3,15,7,13,17] },
+                    "IN": { holes: ["10","11","12","13","14","15","16","17","18"], par: [4,3,4,5,4,4,5,3,4], hdcp: [4,12,16,8,10,2,6,18,14] }
+                },
+                "全國球場": {
+                    "OUT": { holes: ["1","2","3","4","5","6","7","8","9"], par: [4,4,5,4,3,4,5,3,4], hdcp: [17,11,9,5,13,1,3,15,7] },
+                    "IN": { holes: ["10","11","12","13","14","15","16","17","18"], par: [4,3,4,5,3,4,5,4,4], hdcp: [18,16,12,10,14,2,4,6,8] }
+                },
+                "南峰球場": {
+                    "OUT": { holes: ["1","2","3","4","5","6","7","8","9"], par: [5,4,4,3,4,4,3,5,4], hdcp: [3,9,15,13,5,1,17,11,7] },
+                    "IN": { holes: ["10","11","12","13","14","15","16","17","18"], par: [5,3,4,4,3,4,5,4,4], hdcp: [4,18,10,6,14,2,8,12,16] }
+                }
+            };
+
+            const allPlayerNames = computed(() => {
+                const extras = state.customPlayers.filter(n => n !== "");
+                return [...basePlayers, ...extras];
+            });
+
+            const getZoneData = (zKey) => {
+                const zoneName = zKey === 'z1' ? state.currentZone1 : state.currentZone2;
+                return courseDB[state.currentCourseName][zoneName] || { holes:[], par:[], hdcp:[] };
+            };
+
+            const calculateBB = (zKey, rIdx, colIdx) => {
+                // 如果該欄位沒有名字，不計算
+                if (!state.columnNames[colIdx]) return { text: '', isHdcp: false };
+                if (colIdx === 0) return { text: '', isHdcp: false }; 
+                
+                const zData = getZoneData(zKey);
+                const s1 = parseInt(state.scores[zKey][rIdx][0]); 
+                const s2 = parseInt(state.scores[zKey][rIdx][colIdx]); 
+                const hdcpVal = zData.hdcp[rIdx]; 
+                // ★ 修正：從對應區域的 handicaps 陣列取值
+                const userHandicap = state.handicaps[zKey][colIdx]; 
+
+                const sortedHdcp = [...zData.hdcp].sort((a, b) => a - b);
                 let cutoffHdcp = 0;
-                if (hSet > 0) 
-                {
-                    // 防止 index 超出範圍 (雖然讓桿最多9)
-                    let safeIndex = Math.min(hSet, 9) - 1;
-                    cutoffHdcp = sortedHdcpList[safeIndex];
+                if (userHandicap > 0) {
+                    let safeIdx = Math.min(userHandicap, 9) - 1;
+                    cutoffHdcp = sortedHdcp[safeIdx];
                 }
                 
-                let isHdcp = (hdcp <= cutoffHdcp);
+                const isHdcp = (hdcpVal <= cutoffHdcp);
+
+                if (isNaN(s1) || isNaN(s2)) return { text: '', isHdcp };
+
+                let netS2 = s2 - (isHdcp ? 1 : 0);
+                let diff = '';
                 
-                updateBBDisplay(tableId, r, i, "", isHdcp); 
+                if (netS2 < s1) {
+                    let pts = (s2 < zData.par[rIdx]) ? 2 : 1; 
+                    diff = `+${pts}`;
+                } else if (netS2 > s1) {
+                    let pts = (s1 < zData.par[rIdx]) ? 2 : 1;
+                    diff = `-${pts}`;
+                }
                 
-                if(!isNaN(s1) && !isNaN(sVal)) 
-                {
-                    let net = sVal - (isHdcp?1:0);
-                    let diff = "";
-                    if(net < s1) 
-                    {
-                        let pts = (sVal < par) ? 2 : 1;
-                        diff = `+${pts}`;
-                    } 
-                    else if(net > s1) 
-                    {
-                        let pts = (s1 < par) ? 2 : 1;
-                        diff = `-${pts}`;
+                return { text: diff, isHdcp };
+            };
+
+            const pkResults = computed(() => {
+                const calc = (zKey, p1Name, p2Name, p2Hdcp) => {
+                    const zData = getZoneData(zKey);
+                    
+                    let p1Scores = [], p2Scores = [];
+                    let netTotal = 0;
+                    let p1Total = 0, p2Total = 0;
+
+                    // ★ 修正 PK 邏輯：從 12 個欄位中找名字匹配的
+                    let p1Col = state.columnNames.indexOf(p1Name);
+                    let p2Col = state.columnNames.indexOf(p2Name);
+
+                    const sortedHdcp = [...zData.hdcp].sort((a,b)=>a-b);
+                    let cutoff = (p2Hdcp > 0) ? sortedHdcp[Math.min(p2Hdcp,9)-1] : 0;
+
+                    for(let i=0; i<9; i++) {
+                        let s1 = (p1Col>=0) ? parseInt(state.scores[zKey][i][p1Col]) : NaN;
+                        let s2 = (p2Col>=0) ? parseInt(state.scores[zKey][i][p2Col]) : NaN;
+                        p1Scores.push(isNaN(s1)?'':s1);
+                        p2Scores.push(isNaN(s2)?'':s2);
+                        if(!isNaN(s1)) p1Total += s1;
+                        if(!isNaN(s2)) p2Total += s2;
+
+                        if(!isNaN(s1) && !isNaN(s2)) {
+                            let isHdcp = zData.hdcp[i] <= cutoff;
+                            let netS2 = s2 - (isHdcp ? 1 : 0);
+                            if(netS2 < s1) netTotal += (s2 < zData.par[i] ? 2 : 1);
+                            else if(netS2 > s1) netTotal -= (s1 < zData.par[i] ? 2 : 1);
+                        }
                     }
-                    updateBBDisplay(tableId, r, i, diff, isHdcp);
+                    
+                    let p1Txt="平手", p2Txt="平手", p1Cls="", p2Cls="";
+                    if(netTotal > 0) { p2Txt=`贏 ${netTotal} 洞`; p2Cls="win"; p1Txt=`輸 ${netTotal} 洞`; p1Cls="lose"; }
+                    else if(netTotal < 0) { p1Txt=`贏 ${Math.abs(netTotal)} 洞`; p1Cls="win"; p2Txt=`輸 ${Math.abs(netTotal)} 洞`; p2Cls="lose"; }
+
+                    return { scores: {p1: p1Scores, p2: p2Scores}, totals: {p1: p1Total, p2: p2Total}, p1Txt, p1Cls, p2Txt, p2Cls };
+                };
+
+                return {
+                    f9: calc('z1', state.pk.p1, state.pk.p2, state.pk.hdcp_f9),
+                    b9: calc('z2', state.pk.p1, state.pk.p2, state.pk.hdcp_b9)
+                };
+            });
+
+            // ================= METHODS =================
+
+            const toggleCourse = () => {
+                const courses = Object.keys(courseDB);
+                let idx = courses.indexOf(state.currentCourseName);
+                let nextIdx = (idx + 1) % courses.length;
+                state.currentCourseName = courses[nextIdx];
+                const zones = Object.keys(courseDB[state.currentCourseName]);
+                state.currentZone1 = zones[0];
+                state.currentZone2 = zones.length > 1 ? zones[1] : zones[0];
+            };
+
+            const tryToggleZone = (zKey) => {
+                const hasData = state.scores[zKey].some(row => row.some(val => val !== ""));
+                const zones = Object.keys(courseDB[state.currentCourseName]);
+                const currentZ = zKey === 'z1' ? state.currentZone1 : state.currentZone2;
+                const nextZ = zones[(zones.indexOf(currentZ) + 1) % zones.length];
+
+                if (hasData) {
+                    state.pendingZoneChange = { zKey, nextZone: nextZ };
+                    state.showZoneModal = true;
+                } else {
+                    if (zKey === 'z1') state.currentZone1 = nextZ;
+                    else state.currentZone2 = nextZ;
                 }
-            }
-        }
-    });
-    updateTotals();
-    renderPkTable();
-}
+            };
 
-function updateBBDisplay(tId, rIdx, pIdx, text, isHdcp) 
-{
-    const btn = document.getElementById(`table${tId}-row${rIdx}-p${pIdx}-bb`);
-    if(btn) 
-    {
-        btn.innerText = text;
-        btn.classList.remove('win','lose','handicap-applied');
-        if(text.startsWith('+')) btn.classList.add('win');
-        if(text.startsWith('-')) btn.classList.add('lose');
-        if(isHdcp) btn.classList.add('handicap-applied');
-    }
-}
-
-function updateTotals() 
-{
-    // 1. Calculate 18-hole Grand Totals first
-    let grandTotals18 = new Array(allPlayerNames.length).fill(0);
-    for(let t=1; t<=2; t++) 
-    {
-         for(let r=0; r<9; r++) 
-         {
-            for(let i=0; i<allPlayerNames.length; i++) 
-            {
-                let pNum = i+1;
-                let sBtn = document.getElementById(`table${t}-row${r}-p${pNum}-score`);
-                if(sBtn) 
-                {
-                     let v = parseInt(sBtn.innerText);
-                     if(!isNaN(v)) grandTotals18[i] += v;
+            const confirmZoneChange = (shouldClear) => {
+                const { zKey, nextZone } = state.pendingZoneChange;
+                if (zKey === 'z1') state.currentZone1 = nextZone;
+                else state.currentZone2 = nextZone;
+                if (shouldClear) {
+                    state.scores[zKey] = Array(9).fill().map(() => Array(12).fill(""));
+                    state.baSelections[zKey] = Array(9).fill(null);
                 }
-            }
-         }
-    }
+                state.showZoneModal = false;
+            };
 
-    // 2. Calculate Subtotals & Updates
-    for(let t=1; t<=2; t++) 
-    {
-        let pGross = new Array(allPlayerNames.length).fill(0);
-        let pBA = new Array(4).fill(0);
-        let pBB = new Array(allPlayerNames.length).fill(0);
-
-        for(let r=0; r<9; r++) 
-        {
-            for(let i=0; i<allPlayerNames.length; i++) 
-            {
-                let pNum = i+1;
-                let sBtn = document.getElementById(`table${t}-row${r}-p${pNum}-score`);
-                if(sBtn) 
-                {
-                    let v = parseInt(sBtn.innerText);
-                    if(!isNaN(v)) pGross[i] += v;
-                }
-                if(i<4) 
-                {
-                    let ba = document.getElementById(`table${t}-row${r}-p${pNum}-ba`);
-                    if(ba && ba.innerText==="O") pBA[i]++;
-                }
-                if(i>0) 
-                { 
-                    let bb = document.getElementById(`table${t}-row${r}-p${pNum}-bb`);
-                    if(bb) 
-                    {
-                        let v = parseInt(bb.innerText);
-                        if(!isNaN(v)) pBB[i] += v;
-                    }
-                }
-            }
-        }
-        
-        let p1bb = 0;
-        for(let k=1; k<allPlayerNames.length; k++) p1bb -= pBB[k];
-        pBB[0] = p1bb;
-
-        for(let i=0; i<allPlayerNames.length; i++) 
-        {
-            let pNum = i+1;
-            // Update Grand/Sub Total Row
-            let gEl = document.getElementById(`table${t}-gross-p${pNum}`);
-            if(gEl) 
-            {
-                let sub = pGross[i] > 0 ? pGross[i] : "0";
-                let grand = grandTotals18[i] > 0 ? grandTotals18[i] : "0";
-                gEl.innerHTML = `
-                    <div class="total-display-container">
-                        <span class="val-sub">${sub}</span>
-                        <span class="val-grand">${grand}</span>
-                    </div>
-                `;
-            }
-            
-            if(i<4) 
-            {
-                let baEl = document.getElementById(`table${t}-total-ba-p${pNum}`);
-                if(baEl) baEl.innerText = pBA[i];
-            }
-            
-            let bbEl = document.getElementById(`table${t}-total-bb-p${pNum}`);
-            if(bbEl) 
-            {
-                let val = pBB[i];
-                let str = val>0 ? `+${val}` : `${val}`;
-                if(val===0) str="0";
-                bbEl.innerText = str;
-                bbEl.className = "stats-btn stats-bb"; 
-                if(val>0) bbEl.classList.add('positive');
-                if(val<0) bbEl.classList.add('negative');
-            }
-        }
-    }
-}
-
-// ============================================
-//  7. 渲染與存檔
-// ============================================
-
-function renderAll() 
-{
-    validateState();
-    
-    document.getElementById('course-selector').innerText = currentCourseName;
-    document.getElementById('zone-select-btn-1').innerText = `前 9: ${currentZone1}`;
-    document.getElementById('zone-select-btn-2').innerText = `後 9: ${currentZone2}`;
-    document.getElementById('zone-label-1').innerText = `前 9: ${currentZone1}`;
-    document.getElementById('zone-label-2').innerText = `後 9: ${currentZone2}`;
-    
-    [1,2].forEach(tId => 
-    {
-        const zName = (tId===1)?currentZone1:currentZone2;
-        const zData = COURSE_DATA[currentCourseName].zones[zName];
-        const thead = document.getElementById(`header-${tId}`);
-        const tbody = document.getElementById(`body-${tId}`);
-        
-        let hHtml = `<th class="col-combined-header">Hole<br><span style="font-size:0.8em; opacity:0.8;">HDCP</span></th>`;
-        
-        for(let i=0; i<allPlayerNames.length; i++) 
-        {
-            let pNum = i+1;
-            let hdcpWidget = (i===0) ? `<div class="host-btn">爐主</div>` : `<div class="handicap-btn" id="table${tId}-hdcp-p${pNum}" onclick="handleHdcpClick(this)">讓 4</div>`;
-            
-            // Remove gross-score from header (moved to bottom)
-            let statsHtml = `
-                <div class="info-row">
-                    ${hdcpWidget}
-                </div>
-                <div class="stats-container">
-                    ${ (i<4) ? `<div class="stats-btn stats-ba" id="table${tId}-total-ba-p${pNum}">0</div>` : '' }
-                    <div class="stats-btn stats-bb" id="table${tId}-total-bb-p${pNum}">0</div>
-                </div>
-            `;
-            hHtml += `<th class="player-header">
-                <button class="player-name-btn ${tId===2?'locked':''}" id="table${tId}-p${pNum}-name" onclick="handleNameClick(this)"></button>
-                ${statsHtml}
-            </th>`;
-        }
-        thead.innerHTML = hHtml;
-
-        let bHtml = "";
-        for(let r=0; r<9; r++) 
-        {
-            let hole = zData.holes[r];
-            let par = zData.par[r];
-            let hdcp = zData.hdcp[r];
-            let bg = (par===3)?'bg-par-3':(par>=5?'bg-par-5':'bg-par-4');
-            
-            bHtml += `<tr>
-                <td class="col-combined-cell ${bg}" onclick="handleHoleClick(${tId}, ${r})">
-                    <div class="cell-content">
-                        <div class="hole-val">${hole}</div>
-                        <div class="hdcp-val">\u26F3\uFE0F ${hdcp}</div>
-                    </div>
-                </td>`;
-            
-            for(let i=0; i<allPlayerNames.length; i++) 
-            {
-                let pNum = i+1;
-                bHtml += `<td>
-                    <button class="score-btn locked-btn" id="table${tId}-row${r}-p${pNum}-score" onclick="handleScoreClick(this, ${par})"></button>
-                    <div class="sub-btn-container">
-                        ${ (i<4) ? `<button class="btn-ba" id="table${tId}-row${r}-p${pNum}-ba" onclick="handleBAClick(${tId}, ${r}, ${i})"></button>` : '' }
-                        ${ (i>0) ? `<button class="btn-bb" id="table${tId}-row${r}-p${pNum}-bb"></button>` : '' }
-                    </div>
-                </td>`;
-            }
-            bHtml += `</tr>`;
-        }
-
-        // New Total Row at bottom
-        let totalLabel = (tId === 1) ? "前 9<br>總桿" : "後 9<br>總桿";
-        bHtml += `<tr class="total-row">
-            <td class="col-combined-cell total-label">${totalLabel}</td>`;
-            
-        for(let i=0; i<allPlayerNames.length; i++) 
-        {
-            let pNum = i+1;
-            // ID format: table1-gross-p1
-            bHtml += `<td><div id="table${tId}-gross-p${pNum}" class="gross-score-cell"></div></td>`;
-        }
-        bHtml += `</tr>`;
-
-        tbody.innerHTML = bHtml;
-    });
-
-    restoreScoresToDOM(); 
-    
-    renderPkTable();
-    updateRowLockVisuals();
-    
-    // 渲染後恢復 BA 背景色
-    refreshBaBackgrounds(1);
-    refreshBaBackgrounds(2);
-}
-
-function restoreScoresToDOM()
-{
-    const json = localStorage.getItem(STORAGE_KEY);
-    if(!json) return;
-    try {
-        const data = JSON.parse(json);
-        if(data.values) {
-            for(const [id, val] of Object.entries(data.values)) {
-                let el = document.getElementById(id);
-                if(el) {
-                    el.innerText = val;
-                    if(id.includes('-score')) {
-                       let parts = id.split('-');
-                       let tId = parseInt(parts[0].replace('table',''));
-                       let rIdx = parseInt(parts[1].replace('row',''));
-                       let zName = (tId === 1) ? currentZone1 : currentZone2;
-                       if (COURSE_DATA[currentCourseName] && COURSE_DATA[currentCourseName].zones[zName]) {
-                           let zData = COURSE_DATA[currentCourseName].zones[zName];
-                           if(zData && zData.par) {
-                               updateScoreVisual(el, parseInt(val), zData.par[rIdx]);
-                           }
-                       }
+            const handleHoleClick = (zKey, rIdx) => {
+                if (state.activeEditingRow && state.activeEditingRow.zKey === zKey && state.activeEditingRow.rIdx === rIdx) {
+                    state.activeEditingRow = null; 
+                } else {
+                    state.activeEditingRow = { zKey, rIdx }; 
+                    const rowScores = state.scores[zKey][rIdx];
+                    const hasAnyScore = rowScores.some(s => s !== "");
+                    
+                    if (!hasAnyScore) {
+                        const par = getZoneData(zKey).par[rIdx];
+                        // 幫所有有名字的 column 填入 PAR
+                        state.columnNames.forEach((name, i) => {
+                            if(name) state.scores[zKey][rIdx][i] = par;
+                        });
                     }
                 }
-            }
-        }
-    } catch(e) { console.error(e); }
-}
+            };
 
-function saveData() 
-{
-    const settings = { 
-        course: currentCourseName, z1: currentZone1, z2: currentZone2,
-        custom: customPlayers,
-        pk: { p1: pk_p1_name, p2: pk_p2_name, hf: pk_p2_hdcp_f9, hb: pk_p2_hdcp_b9 }
-    };
-    const values = {};
-    document.querySelectorAll('[id^="table"]').forEach(el => 
-    {
-        if(el.id.includes('-score') || el.id.includes('-ba') || el.id.includes('-hdcp') || el.id.includes('-name')) {
-             values[el.id] = el.innerText;
-        }
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({settings, values}));
-}
+            const updateScore = (zKey, rIdx, colIdx) => {
+                if (!isRowEditing(zKey, rIdx)) return;
+                // 如果該欄位沒名字，不給輸入
+                if (!state.columnNames[colIdx]) return;
 
-function loadInputValues() 
-{
-    const json = localStorage.getItem(STORAGE_KEY);
-    if(!json) {
-        for(let i=0; i<4; i++) {
-             let n = basePlayerNames[i] || "";
-             let b1 = document.getElementById(`table1-p${i+1}-name`);
-             let b2 = document.getElementById(`table2-p${i+1}-name`);
-             if(b1) b1.innerText = n;
-             if(b2) b2.innerText = n;
-        }
-        return;
-    }
-    try {
-        const data = JSON.parse(json);
-        // Load Settings ONLY on startup
-        if(data.settings) {
-            currentCourseName = data.settings.course || "台中國際";
-            currentZone1 = data.settings.z1 || "東區";
-            currentZone2 = data.settings.z2 || "西區";
+                let curr = state.scores[zKey][rIdx][colIdx];
+                let next;
+                if (curr === "") next = 1;
+                else {
+                    next = parseInt(curr) + 1;
+                    if (next > 9) next = "";
+                }
+                state.scores[zKey][rIdx][colIdx] = next;
+            };
+
+            const toggleBA = (zKey, rIdx, colIdx) => {
+                if (state.baSelections[zKey][rIdx] === colIdx) {
+                    state.baSelections[zKey][rIdx] = null; 
+                } else {
+                    state.baSelections[zKey][rIdx] = colIdx; 
+                }
+            };
+
+            const calculateGross = (zKey, colIdx) => {
+                let total = 0;
+                for(let i=0; i<9; i++) {
+                    let s = parseInt(state.scores[zKey][i][colIdx]);
+                    if(!isNaN(s)) total += s;
+                }
+                return total > 0 ? total : 0;
+            };
+
+            const calculateGrandTotal = (colIdx) => {
+                return calculateGross('z1', colIdx) + calculateGross('z2', colIdx);
+            };
+
+            const countBA = (colIdx, zKey) => {
+                return state.baSelections[zKey].filter(sel => sel === colIdx).length;
+            };
+
+            const countBB = (colIdx, zKey) => {
+                let total = 0;
+                for(let i=0; i<9; i++) {
+                    let bb = calculateBB(zKey, i, colIdx);
+                    if(bb.text.startsWith('+')) total += parseInt(bb.text.replace('+',''));
+                    else if(bb.text.startsWith('-')) total -= parseInt(bb.text.replace('-',''));
+                }
+                return total;
+            };
+
+            const getZoneName = (zKey) => zKey === 'z1' ? state.currentZone1 : state.currentZone2;
+            const isRowEditing = (zKey, rIdx) => state.activeEditingRow?.zKey === zKey && state.activeEditingRow?.rIdx === rIdx;
             
-            if(data.settings.custom) {
-                customPlayers = data.settings.custom;
-                document.getElementById('custom-p1').value = customPlayers[0] || "";
-                document.getElementById('custom-p2').value = customPlayers[1] || "";
-                document.getElementById('custom-p3').value = customPlayers[2] || "";
-                document.getElementById('custom-p4').value = customPlayers[3] || "";
-                let extras = customPlayers.filter(n=>n!=="");
-                allPlayerNames = [...basePlayerNames, ...extras];
-            }
-            if(data.settings.pk) {
-                pk_p1_name = data.settings.pk.p1 || basePlayerNames[0];
-                pk_p2_name = data.settings.pk.p2 || basePlayerNames[1];
-                pk_p2_hdcp_f9 = data.settings.pk.hf || 4;
-                pk_p2_hdcp_b9 = data.settings.pk.hb || 4;
-            }
+            const getParBgClass = (par) => {
+                if (par === 3) return 'bg-par-3';
+                if (par === 5) return 'bg-par-5';
+                return 'bg-par-4';
+            };
+
+            const getScoreClass = (score, par) => {
+                if(!score) return '';
+                let s = parseInt(score);
+                let diff = s - par;
+                if(diff===0) return 'style-par';
+                if(diff===1) return 'style-bogey';
+                if(diff>=2) return 'style-double-bogey';
+                if(diff===-1) return 'style-birdie';
+                if(diff<=-2) return 'style-eagle';
+                return '';
+            };
+            const getBBClass = (zKey, rIdx, colIdx) => {
+                let bb = calculateBB(zKey, rIdx, colIdx);
+                let cls = [];
+                if(bb.text.startsWith('+')) cls.push('win');
+                else if(bb.text.startsWith('-')) cls.push('lose');
+                if(bb.isHdcp) cls.push('handicap-applied');
+                return cls;
+            };
+
+            // ★ 修正：循環切換玩家邏輯 (含空白)
+            // 列表：[所有玩家] + [空白]
+            const cyclePlayerName = (colIdx) => {
+                if(!state.isEditMode) return;
+                
+                let currentName = state.columnNames[colIdx];
+                let allOptions = [...allPlayerNames.value, ""]; // 包含空白選項
+                
+                let idx = allOptions.indexOf(currentName);
+                if (idx === -1) idx = -1; // 找不到就從頭開始
+                
+                let nextName = allOptions[(idx + 1) % allOptions.length];
+                state.columnNames[colIdx] = nextName;
+            };
+
+            // ★ 修正：讓桿獨立 zKey
+            const toggleHandicap = (colIdx, zKey) => {
+                let h = state.handicaps[zKey][colIdx];
+                state.handicaps[zKey][colIdx] = (h >= 9) ? 0 : h + 1;
+            };
+
+            const togglePkPlayer = (pNum) => {
+                let curr = pNum===1 ? state.pk.p1 : state.pk.p2;
+                let idx = allPlayerNames.value.indexOf(curr);
+                let next = allPlayerNames.value[(idx+1) % allPlayerNames.value.length];
+                if(pNum===1) state.pk.p1 = next; else state.pk.p2 = next;
+            };
+            const togglePkHdcp = (zone) => {
+                if(zone==='f9') state.pk.hdcp_f9 = state.pk.hdcp_f9 >=9 ? 0 : state.pk.hdcp_f9+1;
+                else state.pk.hdcp_b9 = state.pk.hdcp_b9 >=9 ? 0 : state.pk.hdcp_b9+1;
+            };
+
+            const saveData = () => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            };
+            
+            const loadData = () => {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // 注意：如果是舊版資料可能沒有 columnNames 或 handicaps 結構不同，需做容錯
+                    if (!parsed.columnNames) {
+                        parsed.columnNames = Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : "");
+                    }
+                    // 確保 handicaps 是物件結構 (舊版是陣列)
+                    if (Array.isArray(parsed.handicaps)) {
+                        parsed.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
+                    }
+                    // 確保 scores 有 12 欄
+                    ['z1', 'z2'].forEach(k => {
+                        parsed.scores[k] = parsed.scores[k].map(row => {
+                            if (row.length < 12) return [...row, ...Array(12 - row.length).fill("")];
+                            return row;
+                        });
+                    });
+
+                    Object.assign(state, parsed);
+                }
+            };
+
+            const resetAllData = () => {
+                if(confirm("確定清除所有紀錄?")) {
+                    state.scores.z1 = Array(9).fill().map(() => Array(12).fill(""));
+                    state.scores.z2 = Array(9).fill().map(() => Array(12).fill(""));
+                    state.baSelections.z1 = Array(9).fill(null);
+                    state.baSelections.z2 = Array(9).fill(null);
+                    state.columnNames = Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : "");
+                    state.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
+                    saveData();
+                }
+            };
+
+            watch(state, () => {
+                saveData();
+            }, { deep: true });
+
+            onMounted(() => {
+                loadData();
+            });
+
+            return {
+                ...toRefs(state),
+                allPlayerNames,
+                courseDB,
+                toggleCourse,
+                tryToggleZone,
+                confirmZoneChange,
+                handleHoleClick,
+                updateScore,
+                toggleBA,
+                calculateGross,
+                calculateGrandTotal,
+                countBA,
+                countBB,
+                getZoneName,
+                getZoneData,
+                isRowEditing,
+                getParBgClass,
+                getScoreClass,
+                calculateBB,
+                getBBClass,
+                cyclePlayerName,
+                toggleHandicap,
+                togglePkPlayer,
+                togglePkHdcp,
+                pkResults,
+                resetAllData
+            };
         }
-    } catch(e) { console.error(e); }
-}
-
-function handleZoneModal(option) 
-{
-    const modal = document.getElementById('zone-modal');
-    modal.style.display = 'none';
-    if (!pendingZoneChange) return;
-    const { tableId, nextZone } = pendingZoneChange;
-
-    if (option === 1) applyZoneChange(tableId, nextZone, false);
-    else if (option === 2) applyZoneChange(tableId, nextZone, true);
-    else if (option === 3) pendingZoneChange = null;
-}
-
-function resetAllData() 
-{
-    if(confirm("確定清除所有紀錄?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-    }
-}
-
-// Init Sequence
-loadInputValues(); // Load state from storage ONCE
-renderAll();       // Render based on loaded state
-updateAllBBCalculations(); // Calc totals
-    </script>
+    }).mount('#app');
+</script>
 </body>
 </html>
