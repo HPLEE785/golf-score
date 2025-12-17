@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v59 寬度微調版</title>
+    <title>高爾夫分數紀錄卡 - v61 最終修正版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v59)
+           CSS 樣式表 (v61)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -90,12 +90,12 @@
         .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
         .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
         
-        /* ★ 修正 2 & 3：PK 欄位寬度與按鈕寬度 */
-        .pk-name-cell { width: 120px; min-width: 120px; max-width: 120px; } /* Cell 固定 120 */
+        /* ★ 修正 2 & 3：PK Cell=120px, Button=90px */
+        .pk-name-cell { width: 120px; min-width: 120px; max-width: 120px; } 
         .pk-name-btn { 
             background: #f39c12; color: white; border: none; padding: 4px 4px; 
             border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; 
-            width: 90px; min-width: 90px; /* 按鈕固定 90 */
+            width: 90px; min-width: 90px; /* 按鈕 90 */
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
         
@@ -126,7 +126,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v59</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v61</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -293,7 +293,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v59_width_fix';
+            const STORAGE_KEY = 'golf_scorecard_v61_final_fix';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -364,6 +364,20 @@
                 return courseDB[state.currentCourseName][zoneName] || { holes:[], par:[], hdcp:[] };
             };
 
+            // ★ 取得有效的 PK 候選人
+            const getValidPkCandidates = () => {
+                let candidates = [];
+                state.columnNames.forEach((name, colIdx) => {
+                    if (!name) return;
+                    const hasScoreZ1 = state.scores.z1.some(row => row[colIdx] !== "");
+                    const hasScoreZ2 = state.scores.z2.some(row => row[colIdx] !== "");
+                    if (hasScoreZ1 || hasScoreZ2) {
+                        candidates.push(name);
+                    }
+                });
+                return candidates;
+            };
+
             const calculateBB = (zKey, rIdx, colIdx) => {
                 if (!state.columnNames[colIdx]) return { text: '', isHdcp: false };
                 if (colIdx === 0) return { text: '', isHdcp: false }; 
@@ -402,7 +416,6 @@
             const pkResults = computed(() => {
                 const calc = (zKey, p1Name, p2Name, p2Hdcp) => {
                     const zData = getZoneData(zKey);
-                    
                     let p1Scores = [], p2Scores = [];
                     let netTotal = 0;
                     let p1Total = 0, p2Total = 0;
@@ -593,12 +606,25 @@
                 state.handicaps[zKey][colIdx] = (h >= 9) ? 0 : h + 1;
             };
 
+            // ★ 修正：切換 PK 玩家 (只在有效候選人中循環)
             const togglePkPlayer = (pNum) => {
-                let curr = pNum===1 ? state.pk.p1 : state.pk.p2;
-                let idx = allPlayerNames.value.indexOf(curr);
-                let next = allPlayerNames.value[(idx+1) % allPlayerNames.value.length];
-                if(pNum===1) state.pk.p1 = next; else state.pk.p2 = next;
+                const candidates = getValidPkCandidates();
+                if (candidates.length === 0) {
+                    alert("沒有符合條件的玩家 (需在表格中且至少有一洞分數)");
+                    return;
+                }
+
+                let curr = pNum === 1 ? state.pk.p1 : state.pk.p2;
+                let idx = candidates.indexOf(curr);
+                
+                // 如果目前玩家不在候選名單中 (例如被刪除了)，從第 0 個開始
+                let next;
+                if (idx === -1) next = candidates[0];
+                else next = candidates[(idx + 1) % candidates.length];
+
+                if(pNum === 1) state.pk.p1 = next; else state.pk.p2 = next;
             };
+
             const togglePkHdcp = (zone) => {
                 if(zone==='f9') state.pk.hdcp_f9 = state.pk.hdcp_f9 >=9 ? 0 : state.pk.hdcp_f9+1;
                 else state.pk.hdcp_b9 = state.pk.hdcp_b9 >=9 ? 0 : state.pk.hdcp_b9+1;
