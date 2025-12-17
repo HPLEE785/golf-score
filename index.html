@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v58.1 12人版</title>
+    <title>高爾夫分數紀錄卡 - v59 寬度微調版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v58)
+           CSS 樣式表 (v59)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -46,8 +46,9 @@
         .editing-text { color: red !important; animation: blink-red 1s infinite; }
         .active-editing-row td { background-color: #fff59d !important; border-top: 2px solid #fbc02d; border-bottom: 2px solid #fbc02d; color: #000; }
 
-        /* ★ 修正：玩家欄位寬度固定 91px */
+        /* ★ 修正 1：玩家欄位寬度固定 91px */
         .player-header { min-width: 91px; width: 91px; max-width: 91px; }
+        
         .player-name-btn { background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; min-height: 28px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
         .clickable-name { border: 1px dashed rgba(255,255,255,0.5); background: rgba(0,0,0,0.1); } 
@@ -89,8 +90,14 @@
         .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
         .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
         
-        /* ★ 修正：PK 玩家按鈕寬度固定 120px */
-        .pk-name-btn { background: #f39c12; color: white; border: none; padding: 4px 4px; border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; width: 120px; min-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* ★ 修正 2 & 3：PK 欄位寬度與按鈕寬度 */
+        .pk-name-cell { width: 120px; min-width: 120px; max-width: 120px; } /* Cell 固定 120 */
+        .pk-name-btn { 
+            background: #f39c12; color: white; border: none; padding: 4px 4px; 
+            border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; 
+            width: 90px; min-width: 90px; /* 按鈕固定 90 */
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
         
         .pk-status { font-size: 0.9em; font-weight: bold; margin-top: 2px; }
         .pk-status.win { color: blue; } .pk-status.lose { color: red; }
@@ -119,7 +126,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v58.1</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v59</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -220,7 +227,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
+                    <td class="pk-name-cell">
                         <button class="pk-name-btn" @click="togglePkPlayer(1)">{{ pk.p1 }}</button>
                         <div class="host-btn" style="margin-top:2px; font-size:0.8em;">爐主</div>
                         <div class="pk-status" :class="pkResults.f9.p1Cls">{{ pkResults.f9.p1Txt }}</div>
@@ -229,7 +236,7 @@
                     <td style="font-weight:bold;">{{ pkResults.f9.totals.p1 || '' }}</td>
                 </tr>
                 <tr>
-                    <td>
+                    <td class="pk-name-cell">
                         <button class="pk-name-btn" @click="togglePkPlayer(2)">{{ pk.p2 }}</button>
                         <div class="handicap-btn" style="margin-top:2px; font-size:0.8em;" @click="togglePkHdcp('f9')">讓 {{ pk.hdcp_f9 }}</div>
                         <div class="pk-status" :class="pkResults.f9.p2Cls">{{ pkResults.f9.p2Txt }}</div>
@@ -247,12 +254,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><span style="font-weight:bold;">{{ pk.p1 }}</span><div class="pk-status" :class="pkResults.b9.p1Cls">{{ pkResults.b9.p1Txt }}</div></td>
+                    <td class="pk-name-cell"><span style="font-weight:bold;">{{ pk.p1 }}</span><div class="pk-status" :class="pkResults.b9.p1Cls">{{ pkResults.b9.p1Txt }}</div></td>
                     <td v-for="(val, i) in pkResults.b9.scores.p1" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z2').par[i])">{{ val }}</td>
                     <td style="font-weight:bold;">{{ pkResults.b9.totals.p1 || '' }}</td>
                 </tr>
                 <tr>
-                    <td><span style="font-weight:bold;">{{ pk.p2 }}</span><div class="handicap-btn" style="margin-top:2px; font-size:0.8em;" @click="togglePkHdcp('b9')">讓 {{ pk.hdcp_b9 }}</div><div class="pk-status" :class="pkResults.b9.p2Cls">{{ pkResults.b9.p2Txt }}</div></td>
+                    <td class="pk-name-cell"><span style="font-weight:bold;">{{ pk.p2 }}</span><div class="handicap-btn" style="margin-top:2px; font-size:0.8em;" @click="togglePkHdcp('b9')">讓 {{ pk.hdcp_b9 }}</div><div class="pk-status" :class="pkResults.b9.p2Cls">{{ pkResults.b9.p2Txt }}</div></td>
                     <td v-for="(val, i) in pkResults.b9.scores.p2" :key="i" class="pk-score-cell" :class="getScoreClass(val, getZoneData('z2').par[i])">{{ val }}</td>
                     <td style="font-weight:bold;">{{ pkResults.b9.totals.p2 || '' }}</td>
                 </tr>
@@ -286,7 +293,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v58_12players';
+            const STORAGE_KEY = 'golf_scorecard_v59_width_fix';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -299,7 +306,6 @@
                 showZoneModal: false,
                 pendingZoneChange: null,
                 
-                // ★ 修正：scores 擴充至 12 欄
                 scores: {
                     z1: Array(9).fill().map(() => Array(12).fill("")),
                     z2: Array(9).fill().map(() => Array(12).fill(""))
@@ -310,14 +316,11 @@
                     z2: Array(9).fill(null)
                 },
 
-                // ★ 修正：讓桿獨立設定，且擴充至 12 人
                 handicaps: {
                     z1: Array(12).fill(4),
                     z2: Array(12).fill(4)
                 },
 
-                // ★ 新增：紀錄 12 個欄位目前顯示的玩家名稱 (可含空白)
-                // 預設前4個欄位填入前4位玩家，其餘空白
                 columnNames: Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : ""),
 
                 pk: { p1: basePlayers[0], p2: basePlayers[1], hdcp_f9: 4, hdcp_b9: 4 }
@@ -362,7 +365,6 @@
             };
 
             const calculateBB = (zKey, rIdx, colIdx) => {
-                // 如果該欄位沒有名字，不計算
                 if (!state.columnNames[colIdx]) return { text: '', isHdcp: false };
                 if (colIdx === 0) return { text: '', isHdcp: false }; 
                 
@@ -370,7 +372,6 @@
                 const s1 = parseInt(state.scores[zKey][rIdx][0]); 
                 const s2 = parseInt(state.scores[zKey][rIdx][colIdx]); 
                 const hdcpVal = zData.hdcp[rIdx]; 
-                // ★ 修正：從對應區域的 handicaps 陣列取值
                 const userHandicap = state.handicaps[zKey][colIdx]; 
 
                 const sortedHdcp = [...zData.hdcp].sort((a, b) => a - b);
@@ -406,7 +407,6 @@
                     let netTotal = 0;
                     let p1Total = 0, p2Total = 0;
 
-                    // ★ 修正 PK 邏輯：從 12 個欄位中找名字匹配的
                     let p1Col = state.columnNames.indexOf(p1Name);
                     let p2Col = state.columnNames.indexOf(p2Name);
 
@@ -490,7 +490,6 @@
                     
                     if (!hasAnyScore) {
                         const par = getZoneData(zKey).par[rIdx];
-                        // 幫所有有名字的 column 填入 PAR
                         state.columnNames.forEach((name, i) => {
                             if(name) state.scores[zKey][rIdx][i] = par;
                         });
@@ -500,7 +499,6 @@
 
             const updateScore = (zKey, rIdx, colIdx) => {
                 if (!isRowEditing(zKey, rIdx)) return;
-                // 如果該欄位沒名字，不給輸入
                 if (!state.columnNames[colIdx]) return;
 
                 let curr = state.scores[zKey][rIdx][colIdx];
@@ -577,22 +575,19 @@
                 return cls;
             };
 
-            // ★ 修正：循環切換玩家邏輯 (含空白)
-            // 列表：[所有玩家] + [空白]
             const cyclePlayerName = (colIdx) => {
                 if(!state.isEditMode) return;
                 
                 let currentName = state.columnNames[colIdx];
-                let allOptions = [...allPlayerNames.value, ""]; // 包含空白選項
+                let allOptions = [...allPlayerNames.value, ""]; 
                 
                 let idx = allOptions.indexOf(currentName);
-                if (idx === -1) idx = -1; // 找不到就從頭開始
+                if (idx === -1) idx = -1; 
                 
                 let nextName = allOptions[(idx + 1) % allOptions.length];
                 state.columnNames[colIdx] = nextName;
             };
 
-            // ★ 修正：讓桿獨立 zKey
             const toggleHandicap = (colIdx, zKey) => {
                 let h = state.handicaps[zKey][colIdx];
                 state.handicaps[zKey][colIdx] = (h >= 9) ? 0 : h + 1;
@@ -617,15 +612,12 @@
                 const saved = localStorage.getItem(STORAGE_KEY);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // 注意：如果是舊版資料可能沒有 columnNames 或 handicaps 結構不同，需做容錯
                     if (!parsed.columnNames) {
                         parsed.columnNames = Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : "");
                     }
-                    // 確保 handicaps 是物件結構 (舊版是陣列)
                     if (Array.isArray(parsed.handicaps)) {
                         parsed.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
                     }
-                    // 確保 scores 有 12 欄
                     ['z1', 'z2'].forEach(k => {
                         parsed.scores[k] = parsed.scores[k].map(row => {
                             if (row.length < 12) return [...row, ...Array(12 - row.length).fill("")];
@@ -690,4 +682,3 @@
 </script>
 </body>
 </html>
-
