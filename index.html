@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v58 12人版</title>
+    <title>高爾夫分數紀錄卡 - v58.1 12人版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
@@ -46,8 +46,8 @@
         .editing-text { color: red !important; animation: blink-red 1s infinite; }
         .active-editing-row td { background-color: #fff59d !important; border-top: 2px solid #fbc02d; border-bottom: 2px solid #fbc02d; color: #000; }
 
-        /* ★ 修正：玩家欄位寬度固定 90px */
-        .player-header { min-width: 90px; width: 90px; max-width: 90px; }
+        /* ★ 修正：玩家欄位寬度固定 91px */
+        .player-header { min-width: 91px; width: 91px; max-width: 91px; }
         .player-name-btn { background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; min-height: 28px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
         .clickable-name { border: 1px dashed rgba(255,255,255,0.5); background: rgba(0,0,0,0.1); } 
@@ -119,7 +119,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v58</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v58.1</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -690,3 +690,4 @@
 </script>
 </body>
 </html>
+
