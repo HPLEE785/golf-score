@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v61 最終修正版</title>
+    <title>高爾夫分數紀錄卡 - v66 編輯視圖優化版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v61)
+           CSS 樣式表 (v66)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -28,27 +28,40 @@
         th, td { border: 1px solid #ddd; padding: 2px 1px; background: #fff; }
         thead th { background: #7f8c8d; color: white; }
 
-        /* 左側資訊與底色規則 */
+        /* 左側資訊 */
         .col-combined-header { width: 50px; background: #546e7a !important; color: white; font-size: 0.9em; }
         .col-combined-cell { border-right: 2px solid #ccc; padding: 2px !important; cursor: pointer; }
         .hole-val { font-size: 1.1em; font-weight: bold; }
         .hdcp-val { font-family: "Segoe UI Emoji", sans-serif; font-size: 1.0em; font-weight: 900; opacity: 0.9; }
 
-        /* 底色規則 */
-        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; } /* 紅色底 */
+        /* 底色規則 (Par 顏色) - 使用 !important 確保優先權 */
+        .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; } 
         .bg-par-3 .hole-val, .bg-par-3 .hdcp-val { color: #b71c1c; }
-        .bg-par-4 { background-color: #ffffff !important; color: #333; } /* 白色底 */
+        .bg-par-4 { background-color: #ffffff !important; color: #333; } 
         .bg-par-4 .hole-val, .bg-par-4 .hdcp-val { color: #333; }
-        .bg-par-5 { background-color: #bbdefb !important; color: #0d47a1; } /* 藍色底 */
+        .bg-par-5 { background-color: #bbdefb !important; color: #0d47a1; } 
         .bg-par-5 .hole-val, .bg-par-5 .hdcp-val { color: #0d47a1; }
 
+        /* ★ 編輯模式樣式修正 v66 */
         @keyframes blink-red { 0% { color: red; opacity: 1; } 50% { color: red; opacity: 0.3; } 100% { color: red; opacity: 1; } }
-        .editing-text { color: red !important; animation: blink-red 1s infinite; }
-        .active-editing-row td { background-color: #fff59d !important; border-top: 2px solid #fbc02d; border-bottom: 2px solid #fbc02d; color: #000; }
-
-        /* ★ 修正 1：玩家欄位寬度固定 91px */
-        .player-header { min-width: 91px; width: 91px; max-width: 91px; }
         
+        /* 1. 文字閃爍加速 (0.5s) */
+        .editing-text { color: red !important; animation: blink-red 0.5s infinite; }
+        
+        /* 2. 編輯列的黃色邊框 (所有格子都有) */
+        .active-editing-row td { 
+            border-top: 2px solid #fbc02d; 
+            border-bottom: 2px solid #fbc02d; 
+        }
+
+        /* 3. 鵝黃色背景：只套用到「非」第一欄 (not .col-combined-cell) */
+        .active-editing-row td:not(.col-combined-cell) {
+            background-color: #fff59d !important;
+            color: #000;
+        }
+
+        /* 玩家欄位設定 */
+        .player-header { min-width: 91px; width: 91px; max-width: 91px; }
         .player-name-btn { background: none; border: 1px solid transparent; font-size: 0.95em; font-weight: bold; color: white; cursor: pointer; padding: 2px; width: 100%; border-radius: 4px; display: block; margin-bottom: 2px; min-height: 28px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-name-btn:hover { background-color: rgba(255,255,255,0.2); }
         .clickable-name { border: 1px dashed rgba(255,255,255,0.5); background: rgba(0,0,0,0.1); } 
@@ -64,7 +77,12 @@
         .stats-bb.negative { color: red; background-color: #ffebee; }
         .stats-bb.positive { color: blue; background-color: #e3f2fd; }
 
-        .score-btn { width: 32px; height: 32px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 2px; transition: all 0.1s; background-color: #fff; border: 1px dashed #ccc; color: #ccc; -webkit-user-select: none; padding: 0; }
+        /* 分數按鈕 */
+        .score-btn { 
+            width: 40px; height: 38px; font-size: 1.3em; font-weight: bold; border-radius: 6px; 
+            cursor: pointer; margin-bottom: 0px; transition: all 0.1s; background-color: #fff; 
+            border: 1px dashed #ccc; color: #ccc; -webkit-user-select: none; padding: 0; 
+        }
         .score-btn:active { transform: scale(0.95); }
         
         .style-par { background: #ffcc80; border: 1px solid #ef6c00; color: #000; }
@@ -73,10 +91,20 @@
         .style-birdie { border: 2px solid red; color: red; border-radius: 50%; }
         .style-eagle { border: 2px solid red; color: red; border-radius: 50%; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px red; }
 
-        .sub-btn-container { display: flex; justify-content: center; gap: 1px; height: 22px; }
-        .btn-ba, .btn-bb { width: 15px; height: 22px; background: #fff; border: 1px solid #ccc; border-radius: 3px; font-weight: bold; font-size: 9px; padding: 0; pointer-events: none; }
-        .btn-ba { color: #e74c3c; border: 1px solid #999; cursor: pointer; pointer-events: auto; }
-        .active-ba-bg { background-color: #81c784 !important; border-color: #4caf50 !important; }
+        /* BA/BB 按鈕 */
+        .sub-btn-container { display: flex; justify-content: center; gap: 4px; height: 26px; align-items: center; margin-top: 2px; }
+        .btn-ba, .btn-bb { 
+            width: 32px; height: 24px; background: #fff; border: 1px solid #ccc; 
+            border-radius: 4px; font-weight: bold; font-size: 11px; padding: 0; 
+            pointer-events: none; 
+        }
+        
+        /* BA 按鈕樣式 */
+        .btn-ba { cursor: pointer; pointer-events: auto; }
+        .ba-initial { background: #fff; border-color: #999; color: #e74c3c; } 
+        .ba-locked { background: #fff; border-color: #ddd; color: #ccc; cursor: not-allowed; }
+        .ba-selected { background-color: #2e7d32 !important; border-color: #1b5e20 !important; color: white !important; }
+        .ba-other { background: #c8e6c9; border-color: #81c784; color: #1b5e20; }
         
         .btn-bb { background: #f9f9f9; color: blue; } 
         .btn-bb.lose { color: red; }
@@ -90,12 +118,12 @@
         .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
         .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
         
-        /* ★ 修正 2 & 3：PK Cell=120px, Button=90px */
+        /* PK 欄位 */
         .pk-name-cell { width: 120px; min-width: 120px; max-width: 120px; } 
         .pk-name-btn { 
             background: #f39c12; color: white; border: none; padding: 4px 4px; 
             border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; 
-            width: 90px; min-width: 90px; /* 按鈕 90 */
+            width: 90px; min-width: 90px; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
         
@@ -126,7 +154,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v61</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v66</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -190,7 +218,7 @@
                         </button>
                         <div class="sub-btn-container">
                             <button class="btn-ba" 
-                                    :class="{ 'active-ba-bg': baSelections[zKey][rIdx] !== null }"
+                                    :class="getBAClass(zKey, rIdx, colIdx-1)"
                                     @click="toggleBA(zKey, rIdx, colIdx-1)">
                                 {{ baSelections[zKey][rIdx] === (colIdx-1) ? 'O' : '' }}
                             </button>
@@ -293,7 +321,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v61_final_fix';
+            const STORAGE_KEY = 'golf_scorecard_v66_edit_visual';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -364,7 +392,6 @@
                 return courseDB[state.currentCourseName][zoneName] || { holes:[], par:[], hdcp:[] };
             };
 
-            // ★ 取得有效的 PK 候選人
             const getValidPkCandidates = () => {
                 let candidates = [];
                 state.columnNames.forEach((name, colIdx) => {
@@ -516,15 +543,23 @@
 
                 let curr = state.scores[zKey][rIdx][colIdx];
                 let next;
+                
+                const par = getZoneData(zKey).par[rIdx];
+                let limit = 9;
+                if (par === 3) limit = 6;
+                else if (par === 4) limit = 8;
+
                 if (curr === "") next = 1;
                 else {
                     next = parseInt(curr) + 1;
-                    if (next > 9) next = "";
+                    if (next > limit) next = "";
                 }
                 state.scores[zKey][rIdx][colIdx] = next;
             };
 
             const toggleBA = (zKey, rIdx, colIdx) => {
+                if (!isRowEditing(zKey, rIdx)) return;
+                
                 if (state.baSelections[zKey][rIdx] === colIdx) {
                     state.baSelections[zKey][rIdx] = null; 
                 } else {
@@ -588,6 +623,14 @@
                 return cls;
             };
 
+            const getBAClass = (zKey, rIdx, colIdx) => {
+                const selectedIdx = state.baSelections[zKey][rIdx];
+                if (selectedIdx === colIdx) return 'ba-selected'; 
+                if (selectedIdx !== null) return 'ba-other';    
+                if (!isRowEditing(zKey, rIdx)) return 'ba-locked';
+                return 'ba-initial';
+            };
+
             const cyclePlayerName = (colIdx) => {
                 if(!state.isEditMode) return;
                 
@@ -606,7 +649,6 @@
                 state.handicaps[zKey][colIdx] = (h >= 9) ? 0 : h + 1;
             };
 
-            // ★ 修正：切換 PK 玩家 (只在有效候選人中循環)
             const togglePkPlayer = (pNum) => {
                 const candidates = getValidPkCandidates();
                 if (candidates.length === 0) {
@@ -617,7 +659,6 @@
                 let curr = pNum === 1 ? state.pk.p1 : state.pk.p2;
                 let idx = candidates.indexOf(curr);
                 
-                // 如果目前玩家不在候選名單中 (例如被刪除了)，從第 0 個開始
                 let next;
                 if (idx === -1) next = candidates[0];
                 else next = candidates[(idx + 1) % candidates.length];
@@ -696,12 +737,13 @@
                 getScoreClass,
                 calculateBB,
                 getBBClass,
+                getBAClass,
                 cyclePlayerName,
                 toggleHandicap,
                 togglePkPlayer,
                 togglePkHdcp,
                 pkResults,
-                resetAllData
+                resetAllData,
             };
         }
     }).mount('#app');
