@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v66 編輯視圖優化版</title>
+    <title>高爾夫分數紀錄卡 - v69 標題排版優化版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v66)
+           CSS 樣式表 (v69)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -23,7 +23,26 @@
 
         /* 表格容器 */
         .card-container { max-width: 100%; margin: 0 auto 15px auto; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; overflow-x: auto; }
-        .zone-header { background-color: #27ae60; color: white; padding: 8px 12px; font-size: 1.3em; font-weight: bold; display: flex; gap: 10px; }
+        
+        /* ★ v69 標題區域排版修改 */
+        .zone-header { background-color: #27ae60; color: white; padding: 8px 12px; font-weight: bold; display: flex; flex-direction: column; gap: 4px; }
+        
+        /* 第一行：標題 + 統計資訊 */
+        .header-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+        .zone-title-text { font-size: 1.3em; white-space: nowrap; }
+        .summary-info { font-size: 0.95em; color: #e8f5e9; font-weight: normal; }
+
+        /* 第二行：贏家列表 */
+        .winner-list { 
+            color: #fff59d; 
+            font-weight: bold; 
+            font-size: 1.0em; 
+            margin-top: 2px; 
+            padding-top: 2px; 
+            border-top: 1px dashed rgba(255,255,255,0.3); /* 分隔線 */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
+        }
+
         table { width: 100%; border-collapse: collapse; text-align: center; min-width: 800px; }
         th, td { border: 1px solid #ddd; padding: 2px 1px; background: #fff; }
         thead th { background: #7f8c8d; color: white; }
@@ -34,7 +53,7 @@
         .hole-val { font-size: 1.1em; font-weight: bold; }
         .hdcp-val { font-family: "Segoe UI Emoji", sans-serif; font-size: 1.0em; font-weight: 900; opacity: 0.9; }
 
-        /* 底色規則 (Par 顏色) - 使用 !important 確保優先權 */
+        /* 底色規則 (Par 顏色) */
         .bg-par-3 { background-color: #ffcdd2 !important; color: #b71c1c; } 
         .bg-par-3 .hole-val, .bg-par-3 .hdcp-val { color: #b71c1c; }
         .bg-par-4 { background-color: #ffffff !important; color: #333; } 
@@ -42,19 +61,14 @@
         .bg-par-5 { background-color: #bbdefb !important; color: #0d47a1; } 
         .bg-par-5 .hole-val, .bg-par-5 .hdcp-val { color: #0d47a1; }
 
-        /* ★ 編輯模式樣式修正 v66 */
+        /* 編輯模式樣式 */
         @keyframes blink-red { 0% { color: red; opacity: 1; } 50% { color: red; opacity: 0.3; } 100% { color: red; opacity: 1; } }
-        
-        /* 1. 文字閃爍加速 (0.5s) */
         .editing-text { color: red !important; animation: blink-red 0.5s infinite; }
         
-        /* 2. 編輯列的黃色邊框 (所有格子都有) */
         .active-editing-row td { 
             border-top: 2px solid #fbc02d; 
             border-bottom: 2px solid #fbc02d; 
         }
-
-        /* 3. 鵝黃色背景：只套用到「非」第一欄 (not .col-combined-cell) */
         .active-editing-row td:not(.col-combined-cell) {
             background-color: #fff59d !important;
             color: #000;
@@ -99,7 +113,6 @@
             pointer-events: none; 
         }
         
-        /* BA 按鈕樣式 */
         .btn-ba { cursor: pointer; pointer-events: auto; }
         .ba-initial { background: #fff; border-color: #999; color: #e74c3c; } 
         .ba-locked { background: #fff; border-color: #ddd; color: #ccc; cursor: not-allowed; }
@@ -154,7 +167,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v66</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v69</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -169,8 +182,17 @@
 
     <div class="card-container" v-for="zKey in ['z1', 'z2']" :key="zKey">
         <div class="zone-header">
-            {{ zKey === 'z1' ? '前 9' : '後 9' }}: {{ getZoneName(zKey) }}
+            <div class="header-top">
+                <span class="zone-title-text">{{ zKey === 'z1' ? '前 9' : '後 9' }}: {{ getZoneName(zKey) }}</span>
+                <span class="summary-info">
+                    ( 已進行 {{ getZoneSummary(zKey).played }} 洞 , 還有 {{ getZoneSummary(zKey).unclaimed }} 洞沒人拿 )
+                </span>
+            </div>
+            <div class="winner-list" v-if="getZoneSummary(zKey).leaderStr">
+                {{ getZoneSummary(zKey).leaderStr }}
+            </div>
         </div>
+        
         <table>
             <thead>
                 <tr>
@@ -321,7 +343,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v66_edit_visual';
+            const STORAGE_KEY = 'golf_scorecard_v69_layout_fix';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -671,6 +693,38 @@
                 else state.pk.hdcp_b9 = state.pk.hdcp_b9 >=9 ? 0 : state.pk.hdcp_b9+1;
             };
 
+            const getZoneSummary = (zKey) => {
+                let played = 0;
+                let unclaimed = 0;
+
+                for (let i = 0; i < 9; i++) {
+                    const hasScore = state.scores[zKey][i].some(s => s !== "");
+                    
+                    if (hasScore) {
+                        played++;
+                        // 邏輯: 只有在「已進行」的洞中，檢查是否無人拿 BA
+                        if (state.baSelections[zKey][i] === null) {
+                            unclaimed++;
+                        }
+                    }
+                }
+
+                let leaders = [];
+                state.columnNames.forEach((name, colIdx) => {
+                    if (!name) return;
+                    let wins = countBA(colIdx, zKey);
+                    if (wins > 0) {
+                        leaders.push(`${name} 贏 ${wins} 洞`);
+                    }
+                });
+
+                return {
+                    played,
+                    unclaimed, 
+                    leaderStr: leaders.join(' / ')
+                };
+            };
+
             const saveData = () => {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             };
@@ -744,6 +798,7 @@
                 togglePkHdcp,
                 pkResults,
                 resetAllData,
+                getZoneSummary
             };
         }
     }).mount('#app');
