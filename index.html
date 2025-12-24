@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v69 標題排版優化版</title>
+    <title>高爾夫分數紀錄卡 - v70 樣式微調版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v69)
+           CSS 樣式表 (v70)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -24,7 +24,7 @@
         /* 表格容器 */
         .card-container { max-width: 100%; margin: 0 auto 15px auto; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; overflow-x: auto; }
         
-        /* ★ v69 標題區域排版修改 */
+        /* 標題區域排版 */
         .zone-header { background-color: #27ae60; color: white; padding: 8px 12px; font-weight: bold; display: flex; flex-direction: column; gap: 4px; }
         
         /* 第一行：標題 + 統計資訊 */
@@ -32,15 +32,14 @@
         .zone-title-text { font-size: 1.3em; white-space: nowrap; }
         .summary-info { font-size: 0.95em; color: #e8f5e9; font-weight: normal; }
 
-        /* 第二行：贏家列表 */
+        /* ★ v70 修改：贏家列表樣式 (取消粗體，字體大小調整) */
         .winner-list { 
             color: #fff59d; 
-            font-weight: bold; 
-            font-size: 1.0em; 
+            font-weight: normal;  /* 取消粗體 */
+            font-size: 0.95em;    /* 調整為與 summary-info 相同 */
             margin-top: 2px; 
             padding-top: 2px; 
-            border-top: 1px dashed rgba(255,255,255,0.3); /* 分隔線 */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); 
+            border-top: 1px dashed rgba(255,255,255,0.3); 
         }
 
         table { width: 100%; border-collapse: collapse; text-align: center; min-width: 800px; }
@@ -167,7 +166,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v69</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v70</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -343,7 +342,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v69_layout_fix';
+            const STORAGE_KEY = 'golf_scorecard_v70_style_fix';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -702,7 +701,6 @@
                     
                     if (hasScore) {
                         played++;
-                        // 邏輯: 只有在「已進行」的洞中，檢查是否無人拿 BA
                         if (state.baSelections[zKey][i] === null) {
                             unclaimed++;
                         }
