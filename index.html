@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v70 樣式微調版</title>
+    <title>高爾夫分數紀錄卡 - v74 全場統計合併版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v70)
+           CSS 樣式表 (v74)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -25,21 +25,38 @@
         .card-container { max-width: 100%; margin: 0 auto 15px auto; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; overflow-x: auto; }
         
         /* 標題區域排版 */
-        .zone-header { background-color: #27ae60; color: white; padding: 8px 12px; font-weight: bold; display: flex; flex-direction: column; gap: 4px; }
+        .zone-header { 
+            background-color: #2e7d32; 
+            color: #FFFFFF;            
+            padding: 8px 12px; 
+            font-weight: bold; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+        }
         
         /* 第一行：標題 + 統計資訊 */
         .header-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
         .zone-title-text { font-size: 1.3em; white-space: nowrap; }
-        .summary-info { font-size: 0.95em; color: #e8f5e9; font-weight: normal; }
+        .summary-info { font-size: 0.95em; color: #FFFFFF; font-weight: normal; opacity: 0.9; }
 
-        /* ★ v70 修改：贏家列表樣式 (取消粗體，字體大小調整) */
-        .winner-list { 
+        /* 第二行：輸贏網格 (2欄) */
+        .winner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 4px 10px;
+            width: 100%;
+            margin-top: 4px; 
+            padding-top: 4px; 
+            border-top: 1px dashed rgba(255,255,255,0.4); 
+        }
+
+        .winner-item {
             color: #fff59d; 
-            font-weight: normal;  /* 取消粗體 */
-            font-size: 0.95em;    /* 調整為與 summary-info 相同 */
-            margin-top: 2px; 
-            padding-top: 2px; 
-            border-top: 1px dashed rgba(255,255,255,0.3); 
+            font-weight: normal; 
+            font-size: 0.95em;
+            text-align: left;
+            white-space: nowrap; 
         }
 
         table { width: 100%; border-collapse: collapse; text-align: center; min-width: 800px; }
@@ -166,7 +183,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v70</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v74</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -184,11 +201,13 @@
             <div class="header-top">
                 <span class="zone-title-text">{{ zKey === 'z1' ? '前 9' : '後 9' }}: {{ getZoneName(zKey) }}</span>
                 <span class="summary-info">
-                    ( 已進行 {{ getZoneSummary(zKey).played }} 洞 , 還有 {{ getZoneSummary(zKey).unclaimed }} 洞沒人拿 )
+                    ( 已進行 {{ getGlobalSummary().played }} 洞 , 還有 {{ getGlobalSummary().unclaimed }} 洞沒人拿 )
                 </span>
             </div>
-            <div class="winner-list" v-if="getZoneSummary(zKey).leaderStr">
-                {{ getZoneSummary(zKey).leaderStr }}
+            <div class="winner-grid">
+                <div v-for="leader in getGlobalSummary().leaders" class="winner-item">
+                    {{ leader }}
+                </div>
             </div>
         </div>
         
@@ -342,7 +361,7 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v70_style_fix';
+            const STORAGE_KEY = 'golf_scorecard_v74_global_stats';
             const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
             
             const state = reactive({
@@ -692,34 +711,60 @@
                 else state.pk.hdcp_b9 = state.pk.hdcp_b9 >=9 ? 0 : state.pk.hdcp_b9+1;
             };
 
-            const getZoneSummary = (zKey) => {
+            // ★ v74 全場統計 (含前9與後9)
+            const getGlobalSummary = () => {
                 let played = 0;
                 let unclaimed = 0;
+                let baCounts = {}; // 紀錄每個玩家贏了幾洞 (index -> count)
+                let totalBAWins = 0; // 全場總共發出了多少個 "O"
+                let activePlayers = []; // 有名字的玩家 index
 
-                for (let i = 0; i < 9; i++) {
-                    const hasScore = state.scores[zKey][i].some(s => s !== "");
-                    
-                    if (hasScore) {
-                        played++;
-                        if (state.baSelections[zKey][i] === null) {
-                            unclaimed++;
+                // 1. 找出所有參與玩家
+                state.columnNames.forEach((name, colIdx) => {
+                    if (name) {
+                        activePlayers.push(colIdx);
+                        baCounts[colIdx] = 0; // 初始化
+                    }
+                });
+
+                // 2. 遍歷 z1 與 z2
+                ['z1', 'z2'].forEach(zKey => {
+                    for (let i = 0; i < 9; i++) {
+                        const hasScore = state.scores[zKey][i].some(s => s !== "");
+                        if (hasScore) {
+                            played++;
+                            const winnerIdx = state.baSelections[zKey][i];
+                            if (winnerIdx === null) {
+                                unclaimed++;
+                            } else {
+                                // 有人贏
+                                if (baCounts[winnerIdx] !== undefined) {
+                                    baCounts[winnerIdx]++;
+                                    totalBAWins++;
+                                }
+                            }
                         }
                     }
-                }
+                });
 
+                let N = activePlayers.length; // 玩家總數
+
+                // 3. 計算輸贏點數並產生字串
                 let leaders = [];
-                state.columnNames.forEach((name, colIdx) => {
-                    if (!name) return;
-                    let wins = countBA(colIdx, zKey);
-                    if (wins > 0) {
-                        leaders.push(`${name} 贏 ${wins} 洞`);
-                    }
+                activePlayers.forEach(colIdx => {
+                    let wins = baCounts[colIdx];
+                    // 公式：(自己贏的洞數 * (N-1)) - (別人贏的洞數)
+                    // 別人贏的洞數 = 總 BA - 自己贏的洞數
+                    let net = (wins * (N - 1)) - (totalBAWins - wins);
+                    
+                    let name = state.columnNames[colIdx];
+                    leaders.push(`${name} 贏 ${wins} 洞 [ ${net} ]`);
                 });
 
                 return {
                     played,
                     unclaimed, 
-                    leaderStr: leaders.join(' / ')
+                    leaders // 陣列供 Grid 顯示
                 };
             };
 
@@ -796,7 +841,7 @@
                 togglePkHdcp,
                 pkResults,
                 resetAllData,
-                getZoneSummary
+                getGlobalSummary // 改為匯出 global summary
             };
         }
     }).mount('#app');
