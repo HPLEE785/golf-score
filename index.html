@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v83 自訂讓桿連動版</title>
+    <title>高爾夫分數紀錄卡 - v84 動態玩家名單版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v83)
+           CSS 樣式表 (v84)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -164,7 +164,6 @@
 
         .custom-player-area { background: #fff; padding: 15px; margin: 10px auto; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        /* ★ v83: 新增自訂玩家欄位佈局與讓桿輸入框 */
         .custom-input-group { display: flex; flex-direction: column; gap: 8px; }
         .custom-player-row { display: flex; align-items: center; gap: 6px; width: 100%; }
         
@@ -176,7 +175,7 @@
         .custom-checkbox { width: 22px; height: 22px; cursor: pointer; flex-shrink: 0; accent-color: #27ae60; margin: 0; }
         .custom-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 0; font-size: 1em; }
         .custom-hdcp-input { 
-            width: 42px; /* 剛好約 3 個數字寬度 */
+            width: 42px; 
             padding: 8px 0; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
@@ -216,7 +215,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v83</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v84</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -414,8 +413,10 @@
 
     createApp({
         setup() {
-            // ★ 更新 Storage Key 到 v83
-            const STORAGE_KEY = 'golf_scorecard_v83_custom_hdcp';
+            // ★ 更新 Storage Key 到 v84
+            const STORAGE_KEY = 'golf_scorecard_v84_dynamic_base';
+            
+            // ★ v84 修改：將預設玩家改為四個佔位符
             const basePlayers = ["玩家一", "玩家二", "玩家三", "玩家四"];
             
             const state = reactive({
@@ -427,7 +428,6 @@
                 customPlayers: Array(36).fill(""),
                 customPlayersChecked: Array(36).fill(false),
                 
-                // ★ v83: 新增儲存自訂玩家前後9洞的讓桿設定，預設為 4
                 customPlayersHdcpF9: Array(36).fill(4),
                 customPlayersHdcpB9: Array(36).fill(4),
                 
@@ -483,9 +483,15 @@
                 }
             };
 
+            // ★ v84 修改：根據打勾的自訂玩家數量，動態縮減預設的 "玩家一~四" 數量
             const allPlayerNames = computed(() => {
                 const extras = state.customPlayers.filter((n, idx) => n !== "" && state.customPlayersChecked[idx]);
-                return [...basePlayers, ...extras];
+                const numExtras = extras.length;
+                
+                // 動態取得預設玩家：若多1個自訂，就少1個預設；若 >=4 個自訂，預設玩家就不出現
+                const activeBasePlayers = basePlayers.slice(0, Math.max(0, 4 - numExtras));
+                
+                return [...activeBasePlayers, ...extras];
             });
 
             const getZoneData = (zKey) => {
@@ -782,25 +788,19 @@
                 let idx = allOptions.indexOf(currentName);
                 if (idx === -1) idx = -1; 
                 
-                // 取得下一個玩家名字
                 let nextName = allOptions[(idx + 1) % allOptions.length];
                 state.columnNames[colIdx] = nextName;
 
-                // ★ v83 核心邏輯：切換玩家時自動帶入設定好的讓桿數
                 if (nextName === "") {
-                    // 空白欄位，重置讓桿為 4
                     state.handicaps.z1[colIdx] = 4;
                     state.handicaps.z2[colIdx] = 4;
                 } else {
-                    // 尋找此名稱是否在我們打勾的「自訂玩家」清單中
                     const customIdx = state.customPlayers.findIndex((name, i) => name === nextName && state.customPlayersChecked[i]);
                     
                     if (customIdx !== -1) {
-                        // 若是自訂玩家，套用他專屬的讓桿數
                         state.handicaps.z1[colIdx] = state.customPlayersHdcpF9[customIdx] !== "" ? state.customPlayersHdcpF9[customIdx] : 4;
                         state.handicaps.z2[colIdx] = state.customPlayersHdcpB9[customIdx] !== "" ? state.customPlayersHdcpB9[customIdx] : 4;
                     } else {
-                        // 若是 basePlayers 預設玩家，則恢復預設值 4
                         state.handicaps.z1[colIdx] = 4;
                         state.handicaps.z2[colIdx] = 4;
                     }
@@ -906,7 +906,6 @@
                         const oldChecked = parsed.customPlayersChecked || [];
                         parsed.customPlayersChecked = Array(36).fill(false).map((_, i) => oldChecked[i] || false);
                     }
-                    // ★ v83: 讀取讓桿數資料，如果沒有舊資料則預設為 4
                     if (!parsed.customPlayersHdcpF9 || parsed.customPlayersHdcpF9.length < 36) {
                         const oldF9 = parsed.customPlayersHdcpF9 || [];
                         parsed.customPlayersHdcpF9 = Array(36).fill(4).map((_, i) => oldF9[i] !== undefined ? oldF9[i] : 4);
@@ -933,9 +932,9 @@
                     state.scores.z2 = Array(9).fill().map(() => Array(12).fill(""));
                     state.baSelections.z1 = Array(9).fill(null);
                     state.baSelections.z2 = Array(9).fill(null);
+                    // ★ v84：重置為預設的四位玩家
                     state.columnNames = Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : "");
                     state.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
-                    // 保留名字跟讓桿設定，但取消打勾
                     state.customPlayersChecked = Array(36).fill(false);
                     saveData();
                 }
