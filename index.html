@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>高爾夫分數紀錄卡 - v79 獎盃位置修復版</title>
+    <title>高爾夫分數紀錄卡 - v83 自訂讓桿連動版</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         /* =========================================
-           CSS 樣式表 (v79)
+           CSS 樣式表 (v83)
            ========================================= */
         body { font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; background-color: #f4f7f6; padding: 5px; padding-bottom: 300px; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
@@ -107,11 +107,7 @@
         .stats-bb.positive { color: blue; background-color: #e3f2fd; }
 
         /* 分數按鈕與包裝容器 */
-        .score-cell-wrapper {
-            position: relative; 
-            display: inline-block;
-        }
-
+        .score-cell-wrapper { position: relative; display: inline-block; }
         .score-btn { 
             width: 40px; height: 38px; font-size: 1.3em; font-weight: bold; border-radius: 6px; 
             cursor: pointer; margin-bottom: 0px; transition: all 0.1s; background-color: #fff; 
@@ -121,12 +117,8 @@
         
         /* 獎盃圖示位置 */
         .trophy-icon {
-            position: absolute;
-            top: 50%;                
-            left: -4px;              
-            transform: translate(-100%, -50%); 
-            font-size: 15px;
-            z-index: 10;
+            position: absolute; top: 50%; left: -4px; transform: translate(-100%, -50%); 
+            font-size: 15px; z-index: 10;
             filter: drop-shadow(1px 1px 0px #fff) drop-shadow(-1px -1px 0px #fff); 
             pointer-events: none;
         }
@@ -144,13 +136,11 @@
             border-radius: 4px; font-weight: bold; font-size: 11px; padding: 0; 
             pointer-events: none; 
         }
-        
         .btn-ba { cursor: pointer; pointer-events: auto; }
         .ba-initial { background: #fff; border-color: #999; color: #e74c3c; } 
         .ba-locked { background: #fff; border-color: #ddd; color: #ccc; cursor: not-allowed; }
         .ba-selected { background-color: #2e7d32 !important; border-color: #1b5e20 !important; color: white !important; }
         .ba-other { background: #c8e6c9; border-color: #81c784; color: #1b5e20; }
-        
         .btn-bb { background: #f9f9f9; color: blue; } 
         .btn-bb.lose { color: red; }
         .btn-bb.handicap-applied { background-color: #ffe0e0 !important; border-color: #ffcccc !important; }
@@ -163,21 +153,48 @@
         .pk-hole-header { font-weight: bold; color: #333; min-width: 30px; font-size: 0.9em; }
         .pk-score-cell { font-size: 1.1em; font-weight: bold; width: 35px; height: 40px; vertical-align: middle; }
         
-        /* PK 欄位 */
         .pk-name-cell { width: 120px; min-width: 120px; max-width: 120px; } 
         .pk-name-btn { 
             background: #f39c12; color: white; border: none; padding: 4px 4px; 
             border-radius: 4px; font-size: 1.0em; font-weight: bold; cursor: pointer; 
-            width: 90px; min-width: 90px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            width: 90px; min-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
-        
         .pk-status { font-size: 0.9em; font-weight: bold; margin-top: 2px; }
         .pk-status.win { color: blue; } .pk-status.lose { color: red; }
 
-        .custom-player-area { background: #fff; padding: 10px; margin: 10px auto; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .custom-input-group { display: flex; gap: 6px; flex-wrap: wrap; }
-        .custom-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 0 0 calc(50% - 3px); box-sizing: border-box; }
+        .custom-player-area { background: #fff; padding: 15px; margin: 10px auto; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* ★ v83: 新增自訂玩家欄位佈局與讓桿輸入框 */
+        .custom-input-group { display: flex; flex-direction: column; gap: 8px; }
+        .custom-player-row { display: flex; align-items: center; gap: 6px; width: 100%; }
+        
+        /* 隱藏 number input 的上下箭頭讓畫面更乾淨 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .custom-checkbox { width: 22px; height: 22px; cursor: pointer; flex-shrink: 0; accent-color: #27ae60; margin: 0; }
+        .custom-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 0; font-size: 1em; }
+        .custom-hdcp-input { 
+            width: 42px; /* 剛好約 3 個數字寬度 */
+            padding: 8px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            text-align: center; 
+            font-size: 0.95em; 
+            flex-shrink: 0; 
+            background-color: #f9f9f9;
+        }
+
+        /* 讓桿標題列 */
+        .custom-player-header-row { 
+            display: flex; align-items: center; gap: 6px; width: 100%; 
+            font-size: 0.85em; color: #666; font-weight: bold; 
+            margin-bottom: 6px; padding: 0 2px; 
+        }
+        .col-check { width: 22px; flex-shrink: 0; }
+        .col-name { flex: 1; }
+        .col-hdcp { width: 42px; text-align: center; flex-shrink: 0; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .modal-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
@@ -199,7 +216,7 @@
             <input type="checkbox" v-model="isEditMode" style="margin-right:4px;"> 編輯玩家
         </label>
 
-        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v79</button>
+        <button class="btn-reset" @click="resetAllData">⚠️ 清除 v83</button>
 
         <div class="control-group" style="margin-left:5px;">
             <span class="label-text">前 9 :</span>
@@ -357,10 +374,25 @@
     </div>
 
     <div class="custom-player-area">
-        <span style="font-weight:bold; color:#555; display:block; margin-bottom:5px;">非定義玩家 (輸入後自動加入名單)</span>
+        <span style="font-weight:bold; color:#555; display:block; margin-bottom:10px;">非定義玩家名單 (打勾後才會加入上方選單)</span>
+        
+        <div class="custom-player-header-row">
+            <span class="col-check"></span>
+            <span class="col-name">玩家名稱</span>
+            <span class="col-hdcp">前9</span>
+            <span class="col-hdcp">後9</span>
+        </div>
+
         <div class="custom-input-group">
-            <input v-for="(name, idx) in customPlayers" :key="idx" type="text" class="custom-input" 
-                   v-model="customPlayers[idx]" :placeholder="'玩家 ' + String.fromCharCode(65+idx)">
+            <div v-for="(name, idx) in customPlayers" :key="idx" class="custom-player-row">
+                <input type="checkbox" class="custom-checkbox" v-model="customPlayersChecked[idx]">
+                <input type="text" class="custom-input" 
+                       v-model="customPlayers[idx]" :placeholder="'玩家 ' + (idx + 1)">
+                <input type="number" class="custom-hdcp-input" 
+                       v-model.number="customPlayersHdcpF9[idx]" min="0" max="99">
+                <input type="number" class="custom-hdcp-input" 
+                       v-model.number="customPlayersHdcpB9[idx]" min="0" max="99">
+            </div>
         </div>
     </div>
 
@@ -382,15 +414,23 @@
 
     createApp({
         setup() {
-            const STORAGE_KEY = 'golf_scorecard_v79_fixed_index';
-            const basePlayers = ["張簡榮力", "洪忠宜", "陳振峯", "趙振明", "李子瑋", "張嘉原", "巫吉生", "吳建輝", "林政翰", "陳威宇", "范秀蘭", "謝旼達", "高台玉", "張銘德"];
+            // ★ 更新 Storage Key 到 v83
+            const STORAGE_KEY = 'golf_scorecard_v83_custom_hdcp';
+            const basePlayers = ["玩家一", "玩家二", "玩家三", "玩家四"];
             
             const state = reactive({
                 currentCourseName: "台中國際",
                 currentZone1: "東區",
                 currentZone2: "西區",
                 isEditMode: false,
-                customPlayers: ["", "", "", ""],
+                
+                customPlayers: Array(36).fill(""),
+                customPlayersChecked: Array(36).fill(false),
+                
+                // ★ v83: 新增儲存自訂玩家前後9洞的讓桿設定，預設為 4
+                customPlayersHdcpF9: Array(36).fill(4),
+                customPlayersHdcpB9: Array(36).fill(4),
+                
                 activeEditingRow: null,
                 showZoneModal: false,
                 pendingZoneChange: null,
@@ -444,7 +484,7 @@
             };
 
             const allPlayerNames = computed(() => {
-                const extras = state.customPlayers.filter(n => n !== "");
+                const extras = state.customPlayers.filter((n, idx) => n !== "" && state.customPlayersChecked[idx]);
                 return [...basePlayers, ...extras];
             });
 
@@ -692,24 +732,20 @@
                 return 'ba-initial';
             };
 
-            // ★ v79 修正：修正幽靈獎盃 + 修正index
             const isUniqueLowScore = (zKey, rIdx, colIdx) => {
-                const myIdx = colIdx - 1; // 修正 index: colIdx 是 1-based, myIdx 是 0-based
+                const myIdx = colIdx - 1; 
                 let myScoreStr = state.scores[zKey][rIdx][myIdx];
                 
-                // 1. 檢查自己有無分數 (修復幽靈獎盃)
                 if (myIdx >= 4 || !state.columnNames[myIdx] || myScoreStr === "") return false;
 
                 const zData = getZoneData(zKey);
                 const holeHdcp = zData.hdcp[rIdx];
                 const myGross = parseInt(myScoreStr);
                 
-                // 強制 P1 讓桿為 0
                 const myHdcp = (myIdx === 0) ? 0 : state.handicaps[zKey][myIdx];
 
-                // 2. 兩兩比對
                 for (let i = 0; i < 4; i++) {
-                    if (i === myIdx) continue; // 不跟自己比
+                    if (i === myIdx) continue; 
 
                     let oppScoreStr = state.scores[zKey][rIdx][i];
                     if (!state.columnNames[i] || oppScoreStr === "") continue;
@@ -746,8 +782,29 @@
                 let idx = allOptions.indexOf(currentName);
                 if (idx === -1) idx = -1; 
                 
+                // 取得下一個玩家名字
                 let nextName = allOptions[(idx + 1) % allOptions.length];
                 state.columnNames[colIdx] = nextName;
+
+                // ★ v83 核心邏輯：切換玩家時自動帶入設定好的讓桿數
+                if (nextName === "") {
+                    // 空白欄位，重置讓桿為 4
+                    state.handicaps.z1[colIdx] = 4;
+                    state.handicaps.z2[colIdx] = 4;
+                } else {
+                    // 尋找此名稱是否在我們打勾的「自訂玩家」清單中
+                    const customIdx = state.customPlayers.findIndex((name, i) => name === nextName && state.customPlayersChecked[i]);
+                    
+                    if (customIdx !== -1) {
+                        // 若是自訂玩家，套用他專屬的讓桿數
+                        state.handicaps.z1[colIdx] = state.customPlayersHdcpF9[customIdx] !== "" ? state.customPlayersHdcpF9[customIdx] : 4;
+                        state.handicaps.z2[colIdx] = state.customPlayersHdcpB9[customIdx] !== "" ? state.customPlayersHdcpB9[customIdx] : 4;
+                    } else {
+                        // 若是 basePlayers 預設玩家，則恢復預設值 4
+                        state.handicaps.z1[colIdx] = 4;
+                        state.handicaps.z2[colIdx] = 4;
+                    }
+                }
             };
 
             const toggleHandicap = (colIdx, zKey) => {
@@ -840,6 +897,25 @@
                     if (Array.isArray(parsed.handicaps)) {
                         parsed.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
                     }
+                    
+                    if (!parsed.customPlayers || parsed.customPlayers.length < 36) {
+                        const oldCustom = parsed.customPlayers || [];
+                        parsed.customPlayers = Array(36).fill("").map((_, i) => oldCustom[i] || "");
+                    }
+                    if (!parsed.customPlayersChecked || parsed.customPlayersChecked.length < 36) {
+                        const oldChecked = parsed.customPlayersChecked || [];
+                        parsed.customPlayersChecked = Array(36).fill(false).map((_, i) => oldChecked[i] || false);
+                    }
+                    // ★ v83: 讀取讓桿數資料，如果沒有舊資料則預設為 4
+                    if (!parsed.customPlayersHdcpF9 || parsed.customPlayersHdcpF9.length < 36) {
+                        const oldF9 = parsed.customPlayersHdcpF9 || [];
+                        parsed.customPlayersHdcpF9 = Array(36).fill(4).map((_, i) => oldF9[i] !== undefined ? oldF9[i] : 4);
+                    }
+                    if (!parsed.customPlayersHdcpB9 || parsed.customPlayersHdcpB9.length < 36) {
+                        const oldB9 = parsed.customPlayersHdcpB9 || [];
+                        parsed.customPlayersHdcpB9 = Array(36).fill(4).map((_, i) => oldB9[i] !== undefined ? oldB9[i] : 4);
+                    }
+
                     ['z1', 'z2'].forEach(k => {
                         parsed.scores[k] = parsed.scores[k].map(row => {
                             if (row.length < 12) return [...row, ...Array(12 - row.length).fill("")];
@@ -859,6 +935,8 @@
                     state.baSelections.z2 = Array(9).fill(null);
                     state.columnNames = Array(12).fill("").map((_, i) => i < 4 ? basePlayers[i] : "");
                     state.handicaps = { z1: Array(12).fill(4), z2: Array(12).fill(4) };
+                    // 保留名字跟讓桿設定，但取消打勾
+                    state.customPlayersChecked = Array(36).fill(false);
                     saveData();
                 }
             };
@@ -900,7 +978,7 @@
                 pkResults,
                 resetAllData,
                 getGlobalSummary,
-                isUniqueLowScore // 匯出新函數
+                isUniqueLowScore
             };
         }
     }).mount('#app');
